@@ -8,11 +8,18 @@ export const mockMembers: Member[] = [
   { id: '5', name: 'Ramesh Babu', avatar: 'https://picsum.photos/seed/ramesh/100', role: 'Member', joined: '2022-05-25' },
 ];
 
+const today = new Date();
+const getRelativeDate = (days: number) => {
+  const date = new Date(today);
+  date.setDate(today.getDate() + days);
+  return date;
+}
+
 export const mockEvents: Event[] = [
   {
     id: 'evt-01',
     title: 'Annual Ugadi Celebration',
-    date: new Date('2024-04-09'),
+    date: getRelativeDate(15), // Upcoming
     description: 'Join us for a day of cultural programs, traditional food, and community bonding to celebrate Ugadi.',
     image: 'https://picsum.photos/seed/ugadi/800/400',
     attendees: 350,
@@ -21,7 +28,7 @@ export const mockEvents: Event[] = [
   {
     id: 'evt-02',
     title: 'Blood Donation Camp',
-    date: new Date('2024-04-28'),
+    date: getRelativeDate(30), // Upcoming
     description: 'Be a hero, save a life. Participate in our annual blood donation drive.',
     image: 'https://picsum.photos/seed/blood-donation/800/400',
     attendees: 80,
@@ -30,11 +37,29 @@ export const mockEvents: Event[] = [
   {
     id: 'evt-03',
     title: 'Summer Kids Camp',
-    date: new Date('2024-05-15'),
+    date: getRelativeDate(45), // Upcoming
     description: 'A fun-filled summer camp for kids aged 6-14, with activities like arts, crafts, and sports.',
     image: 'https://picsum.photos/seed/kids-camp/800/400',
     attendees: 120,
     capacity: 100
+  },
+   {
+    id: 'evt-04',
+    title: 'Diwali Gala Night',
+    date: getRelativeDate(-60), // Past
+    description: 'A spectacular evening celebrating the festival of lights with music, dance, and fireworks.',
+    image: 'https://picsum.photos/seed/diwali-gala/800/400',
+    attendees: 450,
+    capacity: 500
+  },
+  {
+    id: 'evt-05',
+    title: 'Community Sports Day',
+    date: getRelativeDate(-120), // Past
+    description: 'A day of friendly competition and sportsmanship for all age groups.',
+    image: 'https://picsum.photos/seed/sports-day/800/400',
+    attendees: 250,
+    capacity: 300
   }
 ];
 
