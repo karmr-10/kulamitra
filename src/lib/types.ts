@@ -9,7 +9,8 @@ export interface Member {
 export interface Event {
   id: string;
   title: string;
-  date: string; // Changed from Date to string
+  date: string;
+  dateOffset: number;
   description: string;
   image: string;
   attendees: number;
@@ -22,6 +23,7 @@ export interface Announcement {
   content: string;
   author: string;
   date: string;
+  dateOffset: number;
   group: 'All' | 'Youth' | 'Women';
 }
 

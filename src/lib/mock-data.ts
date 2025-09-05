@@ -8,22 +8,11 @@ export const mockMembers: Member[] = [
   { id: '5', name: 'Ramesh Babu', avatar: 'https://picsum.photos/seed/ramesh/100', role: 'Member', joined: '2022-05-25' },
 ];
 
-const getRelativeDate = (days: number) => {
-  const date = new Date();
-  date.setDate(date.getDate() + days);
-  return date.toISOString().split('T')[0]; // Return date as 'YYYY-MM-DD' string
-}
-
-const formatRelativeDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-}
-
-export const mockEvents: Event[] = [
+export const mockEvents: Omit<Event, 'date'>[] = [
   {
     id: 'evt-01',
     title: 'Annual Ugadi Celebration',
-    date: getRelativeDate(15), // Upcoming
+    dateOffset: 15, // Upcoming
     description: 'Join us for a day of cultural programs, traditional food, and community bonding to celebrate Ugadi.',
     image: 'https://picsum.photos/seed/ugadi/800/400',
     attendees: 350,
@@ -32,7 +21,7 @@ export const mockEvents: Event[] = [
   {
     id: 'evt-02',
     title: 'Blood Donation Camp',
-    date: getRelativeDate(30), // Upcoming
+    dateOffset: 30, // Upcoming
     description: 'Be a hero, save a life. Participate in our annual blood donation drive.',
     image: 'https://picsum.photos/seed/blood-donation/800/400',
     attendees: 80,
@@ -41,7 +30,7 @@ export const mockEvents: Event[] = [
   {
     id: 'evt-03',
     title: 'Summer Kids Camp',
-    date: getRelativeDate(45), // Upcoming
+    dateOffset: 45, // Upcoming
     description: 'A fun-filled summer camp for kids aged 6-14, with activities like arts, crafts, and sports.',
     image: 'https://picsum.photos/seed/kids-camp/800/400',
     attendees: 120,
@@ -50,7 +39,7 @@ export const mockEvents: Event[] = [
    {
     id: 'evt-04',
     title: 'Diwali Gala Night',
-    date: getRelativeDate(-60), // Past
+    dateOffset: -60, // Past
     description: 'A spectacular evening celebrating the festival of lights with music, dance, and fireworks.',
     image: 'https://picsum.photos/seed/diwali-gala/800/400',
     attendees: 450,
@@ -59,7 +48,7 @@ export const mockEvents: Event[] = [
   {
     id: 'evt-05',
     title: 'Community Sports Day',
-    date: getRelativeDate(-120), // Past
+    dateOffset: -120, // Past
     description: 'A day of friendly competition and sportsmanship for all age groups.',
     image: 'https://picsum.photos/seed/sports-day/800/400',
     attendees: 250,
@@ -67,10 +56,10 @@ export const mockEvents: Event[] = [
   }
 ];
 
-export const mockAnnouncements: Announcement[] = [
-  { id: 'ann-01', title: 'New ChitFund Scheme Launch', content: 'We are excited to announce a new chit fund scheme "Maha Lakshmi" starting next month. Registrations are open now.', author: 'Admin', date: formatRelativeDate(getRelativeDate(-1)), group: 'All' },
-  { id: 'ann-02', title: 'Youth Wing Meeting', content: 'A meeting for all youth wing members is scheduled for this Saturday at 5 PM to plan upcoming activities.', author: 'Youth Coordinator', date: formatRelativeDate(getRelativeDate(-3)), group: 'Youth' },
-  { id: 'ann-03', title: 'Cooking Competition', content: 'Calling all master chefs! The annual cooking competition will be held on May 5th. Register now to showcase your culinary skills.', author: 'Admin', date: formatRelativeDate(getRelativeDate(-5)), group: 'Women' }
+export const mockAnnouncements: Omit<Announcement, 'date'>[] = [
+  { id: 'ann-01', title: 'New ChitFund Scheme Launch', content: 'We are excited to announce a new chit fund scheme "Maha Lakshmi" starting next month. Registrations are open now.', author: 'Admin', dateOffset: -1, group: 'All' },
+  { id: 'ann-02', title: 'Youth Wing Meeting', content: 'A meeting for all youth wing members is scheduled for this Saturday at 5 PM to plan upcoming activities.', author: 'Youth Coordinator', dateOffset: -3, group: 'Youth' },
+  { id: 'ann-03', title: 'Cooking Competition', content: 'Calling all master chefs! The annual cooking competition will be held on May 5th. Register now to showcase your culinary skills.', author: 'Admin', dateOffset: -5, group: 'Women' }
 ];
 
 export const mockGalleryItems: GalleryItem[] = [

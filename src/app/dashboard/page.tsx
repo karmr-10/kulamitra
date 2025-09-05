@@ -27,10 +27,31 @@ import {
 } from "@/components/ui/table";
 import { mockAnnouncements, mockEvents } from "@/lib/mock-data";
 
+const getRelativeDate = (days: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toISOString().split('T')[0];
+};
+
+const formatRelativeDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+};
+
 export default function DashboardPage() {
-  const upcomingEvent = mockEvents.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
+  const eventsWithRelativeDates = mockEvents.map(event => ({
+    ...event,
+    date: getRelativeDate(event.dateOffset)
+  }));
+  const upcomingEvent = eventsWithRelativeDates.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
   const upcomingEventDate = new Date(upcomingEvent.date);
   upcomingEventDate.setUTCHours(0,0,0,0);
+
+  const announcementsWithRelativeDates = mockAnnouncements.map(announcement => ({
+    ...announcement,
+    date: formatRelativeDate(getRelativeDate(announcement.dateOffset))
+  }));
+
 
   return (
     <div className="flex flex-1 flex-col gap-4 md:gap-8">
@@ -118,7 +139,7 @@ export default function DashboardPage() {
             <CardTitle className="font-headline">Recent Announcements</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-8">
-            {mockAnnouncements.slice(0, 3).map((announcement) => (
+            {announcementsWithRelativeDates.slice(0, 3).map((announcement) => (
               <div key={announcement.id} className="flex items-center gap-4">
                 <Avatar className="hidden h-9 w-9 sm:flex">
                   <AvatarImage data-ai-hint="male avatar" src="https://picsum.photos/seed/announce-author/100" alt="Avatar" />

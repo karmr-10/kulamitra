@@ -78,15 +78,26 @@ function EventCard({ event }: { event: Event }) {
     );
 }
 
+const getRelativeDate = (days: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toISOString().split('T')[0];
+};
+
 export default function EventsPage() {
   const now = new Date();
   now.setHours(0, 0, 0, 0);
+
+  const eventsWithRelativeDates = mockEvents.map(event => ({
+    ...event,
+    date: getRelativeDate(event.dateOffset)
+  }));
   
-  const upcomingEvents = mockEvents
+  const upcomingEvents = eventsWithRelativeDates
     .filter(event => new Date(event.date) >= now)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   
-  const pastEvents = mockEvents
+  const pastEvents = eventsWithRelativeDates
     .filter(event => new Date(event.date) < now)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 

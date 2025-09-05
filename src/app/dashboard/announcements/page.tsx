@@ -10,7 +10,25 @@ import {
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Megaphone } from "lucide-react";
 
+const getRelativeDate = (days: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toISOString().split('T')[0];
+};
+
+const formatRelativeDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+};
+
 export default function AnnouncementsPage() {
+
+  const announcementsWithRelativeDates = mockAnnouncements.map(announcement => ({
+    ...announcement,
+    date: formatRelativeDate(getRelativeDate(announcement.dateOffset))
+  }));
+
+
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -34,7 +52,7 @@ export default function AnnouncementsPage() {
       </div>
 
       <div className="mt-8 grid gap-6">
-        {mockAnnouncements.map((announcement) => (
+        {announcementsWithRelativeDates.map((announcement) => (
           <Card key={announcement.id}>
             <CardHeader>
               <div className="flex items-center justify-between">
