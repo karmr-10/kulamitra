@@ -1,16 +1,28 @@
+
+"use client";
+
+import { useState, useEffect } from "react";
 import { mockMembers } from "@/lib/mock-data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { Member } from "@/lib/types";
 
 export default function MembersPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredMembers, setFilteredMembers] = useState<Member[]>(mockMembers);
+
+  useEffect(() => {
+    const results = mockMembers.filter((member) =>
+      member.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredMembers(results);
+  }, [searchTerm]);
+
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -24,12 +36,17 @@ export default function MembersPage() {
         </div>
         <div className="relative w-full max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input placeholder="Search members..." className="pl-10" />
+          <Input 
+            placeholder="Search members..." 
+            className="pl-10" 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
       </div>
 
       <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {mockMembers.map((member) => (
+        {filteredMembers.map((member) => (
           <Card key={member.id}>
             <CardContent className="flex flex-col items-center p-6 text-center">
               <Avatar className="h-24 w-24 border-2 border-primary">
