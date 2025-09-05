@@ -4,7 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { ArrowRight, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -97,4 +96,10 @@ export function SplashScreen() {
             onClick={handleNext}
           >
             {isLastStep ? "Get Started" : "Next"}
-            {isLastStep ? <Check className="ml-2 h-5 w-5" /> : <ArrowRight className="ml
+            {isLastStep ? <Check className="ml-2 h-5 w-5" /> : <ArrowRight className="ml-2 h-5 w-5" />}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
