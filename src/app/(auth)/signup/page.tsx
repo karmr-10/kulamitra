@@ -53,7 +53,7 @@ export default function SignupPage() {
 
   const setupRecaptcha = () => {
     if (!(window as any).recaptchaVerifier && recaptchaContainerRef.current) {
-      (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainerRef.current, {
+      (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container-signup', {
         'size': 'normal',
         'callback': () => {
            toast.success("reCAPTCHA verified! You can now send the OTP.");
@@ -251,5 +251,3 @@ export default function SignupPage() {
     </div>
   );
 }
-
-    

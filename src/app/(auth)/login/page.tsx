@@ -53,7 +53,7 @@ export default function LoginPage() {
 
   const setupRecaptcha = () => {
     if (!(window as any).recaptchaVerifier && recaptchaContainerRef.current) {
-        (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainerRef.current, {
+        (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container-login', {
             'size': 'normal',
             'callback': () => {
                 toast.success("reCAPTCHA verified! You can now send the OTP.");
@@ -201,7 +201,7 @@ export default function LoginPage() {
                             />
                         </div>
                     )}
-                     <div id="recaptcha-container" ref={recaptchaContainerRef} className="flex justify-center my-4"></div>
+                     <div id="recaptcha-container-login" ref={recaptchaContainerRef} className="flex justify-center my-4"></div>
                     <div className="space-y-3">
                         <Label>Sign in as</Label>
                         <RadioGroup defaultValue="member" className="flex items-center gap-4">
@@ -250,5 +250,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-    
