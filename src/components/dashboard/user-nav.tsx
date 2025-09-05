@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useTheme } from "next-themes";
@@ -22,27 +23,44 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { Moon, Sun } from "lucide-react";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/lib/firebase";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function UserNav() {
   const router = useRouter();
   const { setTheme } = useTheme();
+  const [user, loading] = useAuthState(auth);
+
+  const handleLogout = async () => {
+    await auth.signOut();
+    router.push("/login");
+  };
+
+  if (loading) {
+    return <Skeleton className="h-9 w-9 rounded-full" />;
+  }
+
+  const displayName = user?.displayName || "Guest";
+  const displayEmail = user?.email || "guest@kulamitra.com";
+  const avatarFallback = displayName.split(' ').map(n => n[0]).join('').substring(0, 2) || "G";
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-9 w-9">
-            <AvatarImage src="https://picsum.photos/seed/user-avatar/100" alt="@shadcn" />
-            <AvatarFallback>SK</AvatarFallback>
+            <AvatarImage src={user?.photoURL || `https://avatar.vercel.sh/${displayName}.png`} alt={displayName} />
+            <AvatarFallback>{avatarFallback}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">Srinivas Kumar</p>
+            <p className="text-sm font-medium leading-none">{displayName}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              admin@kulamitra.com
+              {displayEmail}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -80,7 +98,7 @@ export function UserNav() {
           </DropdownMenuPortal>
         </DropdownMenuSub>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => router.push("/login")}>
+        <DropdownMenuItem onClick={handleLogout}>
           Log out
         </DropdownMenuItem>
       </DropdownMenuContent>
