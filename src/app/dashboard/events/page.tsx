@@ -83,7 +83,13 @@ function EventCard({ event }: { event: Event }) {
             fill
             style={{objectFit: 'cover'}}
             className={isPast ? "grayscale" : ""}
-            data-ai-hint={event.title.toLowerCase().split(" ").slice(0,2).join(" ")}
+            data-ai-hint={
+              event.title.toLowerCase().includes('ugadi') ? 'indian festival' :
+              event.title.toLowerCase().includes('blood donation') ? 'charity event' :
+              event.title.toLowerCase().includes('kids camp') ? 'children playing' :
+              event.title.toLowerCase().includes('diwali') ? 'diwali lights' :
+              'community event'
+            }
             />
             <div className="absolute inset-0 bg-black/30" />
             <Badge variant="secondary" className="absolute right-4 top-4">
@@ -273,4 +279,3 @@ export default function EventsPage() {
     </div>
   );
 }
-
