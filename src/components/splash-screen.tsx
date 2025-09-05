@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -56,7 +57,6 @@ export function SplashScreen() {
           fill
           data-ai-hint={currentStep.hint}
           className="object-cover transition-opacity duration-1000"
-          priority
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent" />
       </div>
