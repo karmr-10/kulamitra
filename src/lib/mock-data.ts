@@ -14,6 +14,10 @@ const getRelativeDate = (days: number) => {
   return date;
 }
 
+const formatRelativeDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
 export const mockEvents: Event[] = [
   {
     id: 'evt-01',
@@ -63,9 +67,9 @@ export const mockEvents: Event[] = [
 ];
 
 export const mockAnnouncements: Announcement[] = [
-  { id: 'ann-01', title: 'New ChitFund Scheme Launch', content: 'We are excited to announce a new chit fund scheme "Maha Lakshmi" starting next month. Registrations are open now.', author: 'Admin', date: 'April 5, 2024', group: 'All' },
-  { id: 'ann-02', title: 'Youth Wing Meeting', content: 'A meeting for all youth wing members is scheduled for this Saturday at 5 PM to plan upcoming activities.', author: 'Youth Coordinator', date: 'April 3, 2024', group: 'Youth' },
-  { id: 'ann-03', title: 'Cooking Competition', content: 'Calling all master chefs! The annual cooking competition will be held on May 5th. Register now to showcase your culinary skills.', author: 'Admin', date: 'April 1, 2024', group: 'Women' }
+  { id: 'ann-01', title: 'New ChitFund Scheme Launch', content: 'We are excited to announce a new chit fund scheme "Maha Lakshmi" starting next month. Registrations are open now.', author: 'Admin', date: formatRelativeDate(getRelativeDate(-1)), group: 'All' },
+  { id: 'ann-02', title: 'Youth Wing Meeting', content: 'A meeting for all youth wing members is scheduled for this Saturday at 5 PM to plan upcoming activities.', author: 'Youth Coordinator', date: formatRelativeDate(getRelativeDate(-3)), group: 'Youth' },
+  { id: 'ann-03', title: 'Cooking Competition', content: 'Calling all master chefs! The annual cooking competition will be held on May 5th. Register now to showcase your culinary skills.', author: 'Admin', date: formatRelativeDate(getRelativeDate(-5)), group: 'Women' }
 ];
 
 export const mockGalleryItems: GalleryItem[] = [

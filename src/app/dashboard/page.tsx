@@ -130,7 +130,7 @@ export default function DashboardPage() {
                     {announcement.content}
                   </p>
                 </div>
-                <div className="ml-auto text-sm text-muted-foreground">{announcement.date}</div>
+                <div className="ml-auto text-sm text-muted-foreground whitespace-nowrap">{announcement.date}</div>
               </div>
             ))}
           </CardContent>

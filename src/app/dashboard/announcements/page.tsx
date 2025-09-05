@@ -14,13 +14,18 @@ export default function AnnouncementsPage() {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-headline text-3xl font-bold tracking-tight">
-            Announcements
-          </h1>
-          <p className="text-muted-foreground">
-            Latest news and updates from the community admin.
-          </p>
+        <div className="flex items-start gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+            <Megaphone className="h-6 w-6 text-primary" />
+          </div>
+          <div>
+            <h1 className="font-headline text-3xl font-bold tracking-tight">
+              Announcements
+            </h1>
+            <p className="text-muted-foreground">
+              Latest news and updates from the community admin.
+            </p>
+          </div>
         </div>
         <Button>
           <PlusCircle className="mr-2 h-4 w-4" />
