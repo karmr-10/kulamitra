@@ -52,3 +52,9 @@ export function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElemen
           )}
           {item.adminOnly && (
              <Badge variant="outline" className="text-xs">Admin</Badge>
+          )}
+        </Link>
+      ))}
+    </nav>
+  );
+}

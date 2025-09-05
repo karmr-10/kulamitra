@@ -88,4 +88,10 @@ export default function ChitFundsPage() {
               <Button className="w-full" disabled={fund.status !== 'Open'}>
                 Join Now
               </Button>
-            </
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}

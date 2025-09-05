@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import {
   Bell,
@@ -24,7 +25,7 @@ function OmIcon(props: React.SVGProps<SVGSVGElement>) {
         <path d="M12 12v0c-4.4 0-8 3.6-8 8v0" />
         <path d="M12 2v10" />
         <path d="m3.5 3.5 2 2" />
-        <path dM21 12V2h-5" />
+        <path d="M21 12V2h-5" />
       </svg>
   );
 }
@@ -102,3 +103,4 @@ export default function DashboardLayout({
       </div>
     </div>
   );
+}

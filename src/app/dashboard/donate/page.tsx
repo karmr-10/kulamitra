@@ -55,4 +55,10 @@ export default function DonatePage() {
             </RadioGroup>
           </div>
           <Button size="lg" className="w-full text-lg h-12 bg-accent hover:bg-accent/90">
-            Proceed to
+            Proceed to Pay
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

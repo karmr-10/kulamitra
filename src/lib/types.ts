@@ -27,4 +27,8 @@ export interface Announcement {
 
 export interface GalleryItem {
   id: string;
-  year:
+  year: number;
+  event: string;
+  description: string;
+  imageUrl: string;
+}

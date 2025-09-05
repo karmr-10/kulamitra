@@ -17,4 +17,9 @@ export default function AiSummaryPage() {
           </p>
         </div>
       </div>
-      <div className="mt-8
+      <div className="mt-8">
+        <AiSummaryForm />
+      </div>
+    </div>
+  );
+}

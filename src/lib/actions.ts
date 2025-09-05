@@ -48,4 +48,6 @@ export async function onGenerate(
     return { message: "Summary generated successfully.", summary: result.summary };
   } catch (e) {
     const error = e as Error;
-    return { message:
+    return { message: `Error: ${error.message}` };
+  }
+}

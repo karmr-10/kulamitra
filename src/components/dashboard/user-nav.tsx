@@ -56,4 +56,6 @@ export function UserNav() {
           Log out
         </DropdownMenuItem>
       </DropdownMenuContent>
-    
+    </DropdownMenu>
+  );
+}
