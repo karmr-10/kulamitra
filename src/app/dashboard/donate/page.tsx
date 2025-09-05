@@ -28,8 +28,11 @@ export default function DonatePage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="amount" className="text-lg">Amount (₹)</Label>
-            <Input id="amount" type="number" placeholder="Enter amount" className="h-12 text-lg" />
+            <Label htmlFor="amount" className="text-lg">Amount (INR)</Label>
+            <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-lg text-muted-foreground">₹</span>
+                <Input id="amount" type="number" placeholder="Enter amount" className="h-12 pl-8 text-lg" />
+            </div>
           </div>
           <div className="flex gap-2">
             {[101, 501, 1001, 2001].map(amount => (
