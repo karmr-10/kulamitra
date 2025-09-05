@@ -12,7 +12,7 @@ import { auth, googleProvider } from "@/lib/firebase";
 import { signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Smartphone, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -28,17 +28,11 @@ export default function LoginPage() {
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
-
-  // Effect to set up reCAPTCHA on mount
-  useEffect(() => {
-    // This function will be called by onPhoneNumberSignIn when needed
-  }, []);
+  const recaptchaContainerRef = useRef<HTMLDivElement>(null);
 
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // This is a placeholder for email/password login.
-    // For now, we just redirect. In a real app, you'd verify credentials.
     toast.success("Email login successful (demo)!");
     router.push("/dashboard");
   };
@@ -58,8 +52,8 @@ export default function LoginPage() {
   };
 
   const setupRecaptcha = () => {
-    if (!(window as any).recaptchaVerifier) {
-        (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+    if (!(window as any).recaptchaVerifier && recaptchaContainerRef.current) {
+        (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainerRef.current, {
             'size': 'normal',
             'callback': () => {
                 toast.success("reCAPTCHA verified! You can now send the OTP.");
@@ -72,14 +66,18 @@ export default function LoginPage() {
     }
   }
 
-  // This effect will run when the mobile tab is selected
   const handleMobileTabFocus = () => {
-      // Setup reCAPTCHA only when the container is visible to the user
-      setTimeout(setupRecaptcha, 100);
+      setTimeout(setupRecaptcha, 200); // Small delay to ensure container is rendered
   }
 
   const onPhoneNumberSignIn = async () => {
     setLoading(true);
+    if (!(window as any).recaptchaVerifier) {
+      toast.error("reCAPTCHA not initialized. Please try again.");
+      setLoading(false);
+      return;
+    }
+
     const appVerifier = (window as any).recaptchaVerifier;
     const formatPh = '+' + phoneNumber;
 
@@ -203,7 +201,7 @@ export default function LoginPage() {
                             />
                         </div>
                     )}
-                     <div id="recaptcha-container" className="flex justify-center my-4"></div>
+                     <div id="recaptcha-container" ref={recaptchaContainerRef} className="flex justify-center my-4"></div>
                     <div className="space-y-3">
                         <Label>Sign in as</Label>
                         <RadioGroup defaultValue="member" className="flex items-center gap-4">
@@ -253,4 +251,4 @@ export default function LoginPage() {
   );
 }
 
-  
+    

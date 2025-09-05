@@ -12,7 +12,7 @@ import { auth, googleProvider } from "@/lib/firebase";
 import { signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Smartphone, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -28,10 +28,11 @@ export default function SignupPage() {
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
+  const recaptchaContainerRef = useRef<HTMLDivElement>(null);
+
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
-    // This is a placeholder for email/password signup.
     toast.success("Account created successfully (demo)!");
     router.push("/dashboard");
   };
@@ -51,9 +52,8 @@ export default function SignupPage() {
   };
 
   const setupRecaptcha = () => {
-    // Check if verifier is already initialized
-    if (!(window as any).recaptchaVerifier) {
-      (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container-signup', {
+    if (!(window as any).recaptchaVerifier && recaptchaContainerRef.current) {
+      (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainerRef.current, {
         'size': 'normal',
         'callback': () => {
            toast.success("reCAPTCHA verified! You can now send the OTP.");
@@ -67,12 +67,16 @@ export default function SignupPage() {
   }
 
   const handleMobileTabFocus = () => {
-      // Setup reCAPTCHA only when the container is visible to the user
-      setTimeout(setupRecaptcha, 100);
+      setTimeout(setupRecaptcha, 200);
   }
 
   const onPhoneNumberSignIn = async () => {
     setLoading(true);
+     if (!(window as any).recaptchaVerifier) {
+      toast.error("reCAPTCHA not initialized. Please try again.");
+      setLoading(false);
+      return;
+    }
     const appVerifier = (window as any).recaptchaVerifier;
     const formatPh = '+' + phoneNumber;
 
@@ -198,7 +202,7 @@ export default function SignupPage() {
                         />
                     </div>
                  )}
-                 <div id="recaptcha-container-signup" className="flex justify-center my-4"></div>
+                 <div id="recaptcha-container-signup" ref={recaptchaContainerRef} className="flex justify-center my-4"></div>
                  <div className="space-y-3">
                   <Label>Register as</Label>
                   <RadioGroup defaultValue="member" className="flex items-center gap-4">
@@ -248,4 +252,4 @@ export default function SignupPage() {
   );
 }
 
-  
+    
