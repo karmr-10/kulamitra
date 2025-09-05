@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
@@ -15,8 +15,12 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { mockEvents } from "@/lib/mock-data";
-import { CheckCircle, Users, MapPin, HandHelping, QrCode } from "lucide-react";
+import { CheckCircle, Users, MapPin, HandHelping, QrCode, Camera, AlertTriangle } from "lucide-react";
 import { Event } from "@/lib/types";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 function EventCard({ event }: { event: Event }) {
     const now = new Date();
@@ -25,6 +29,50 @@ function EventCard({ event }: { event: Event }) {
     eventDate.setUTCHours(0,0,0,0);
     const isPast = eventDate < now;
     const formattedDate = eventDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+
+    const [rsvpd, setRsvpd] = useState(false);
+    const [volunteering, setVolunteering] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState<"rsvp" | "track" | null>(null);
+
+    const { toast } = useToast();
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+
+
+    useEffect(() => {
+      if (dialogOpen === 'track') {
+        const getCameraPermission = async () => {
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            console.error("Camera API not available in this browser.");
+            setHasCameraPermission(false);
+            return;
+          }
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({video: true});
+            setHasCameraPermission(true);
+
+            if (videoRef.current) {
+              videoRef.current.srcObject = stream;
+            }
+          } catch (error) {
+            console.error('Error accessing camera:', error);
+            setHasCameraPermission(false);
+            toast({
+              variant: 'destructive',
+              title: 'Camera Access Denied',
+              description: 'Please enable camera permissions in your browser settings to track attendance.',
+            });
+          }
+        };
+        getCameraPermission();
+      } else {
+        if (videoRef.current && videoRef.current.srcObject) {
+            const stream = videoRef.current.srcObject as MediaStream;
+            stream.getTracks().forEach(track => track.stop());
+        }
+      }
+    }, [dialogOpen, toast]);
+
 
     return (
         <Card key={event.id} className="overflow-hidden">
@@ -50,7 +98,7 @@ function EventCard({ event }: { event: Event }) {
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1.5">
                     <Users className="h-4 w-4" />
-                    <span>{event.attendees} / {event.capacity} attending</span>
+                    <span>{event.attendees + (rsvpd ? 1 : 0)} / {event.capacity} attending</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                     <MapPin className="h-4 w-4" />
@@ -61,15 +109,81 @@ function EventCard({ event }: { event: Event }) {
         <CardFooter className="flex gap-2">
             {!isPast && (
                 <>
-                <Button className="bg-primary hover:bg-primary/90">
-                    <CheckCircle className="mr-2 h-4 w-4" /> RSVP
-                </Button>
-                <Button variant="secondary">
-                    <HandHelping className="mr-2 h-4 w-4" /> Volunteer
-                </Button>
-                <Button variant="outline" className="ml-auto">
-                    <QrCode className="mr-2 h-4 w-4" /> Track Attendance
-                </Button>
+                <Dialog onOpenChange={(open) => setDialogOpen(open ? "rsvp" : null)}>
+                  <DialogTrigger asChild>
+                      <Button className="bg-primary hover:bg-primary/90" variant={rsvpd ? "secondary" : "default"}>
+                          <CheckCircle className="mr-2 h-4 w-4" /> {rsvpd ? "RSVP'd" : "RSVP"}
+                      </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                      <DialogHeader>
+                          <DialogTitle className="font-headline">RSVP Confirmation</DialogTitle>
+                          <DialogDescription>
+                              You are about to RSVP for: <strong>{event.title}</strong>
+                          </DialogDescription>
+                      </DialogHeader>
+                      <div className="flex flex-col items-center justify-center space-y-4">
+                          <Image src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${event.id}-${Date.now()}`} alt="QR Code" width={150} height={150} />
+                          <p className="text-center text-sm text-muted-foreground">Show this QR code at the event entrance for check-in.</p>
+                      </div>
+                      <DialogFooter className="sm:justify-center">
+                          <Button type="button" variant="default" onClick={() => { setRsvpd(true); setDialogOpen(null); toast({ title: "RSVP Successful!", description: `See you at ${event.title}!`}) }}>
+                              Confirm RSVP
+                          </Button>
+                      </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+
+
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                         <Button variant={volunteering ? "secondary" : "outline"}>
+                            <HandHelping className="mr-2 h-4 w-4" /> {volunteering ? "Volunteering" : "Volunteer"}
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                        <AlertDialogTitle>Volunteer for {event.title}?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to volunteer for this event? Your help is greatly appreciated and makes our community stronger.
+                        </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                        <AlertDialogCancel>Drop</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => {setVolunteering(true); toast({title: "Thank you for volunteering!", description: "We've added you to the volunteer list."})}}>Confirm</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+
+
+                <Dialog onOpenChange={(open) => setDialogOpen(open ? "track" : null)}>
+                    <DialogTrigger asChild>
+                       <Button variant="outline" className="ml-auto">
+                            <QrCode className="mr-2 h-4 w-4" /> Track Attendance
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Track Event Attendance</DialogTitle>
+                             <DialogDescription>
+                                Position the guest's QR code within the frame to scan and track attendance.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="relative aspect-video w-full overflow-hidden rounded-md border bg-muted">
+                           <video ref={videoRef} className="h-full w-full object-cover" autoPlay playsInline muted />
+                           <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="h-2/3 w-2/3 rounded-lg border-4 border-dashed border-primary" />
+                           </div>
+                           {hasCameraPermission === false && (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 text-white p-4">
+                                   <Camera className="h-12 w-12 text-destructive mb-4" />
+                                    <h3 className="text-lg font-bold">Camera Access Required</h3>
+                                    <p className="text-center text-sm">Please grant camera permissions in your browser settings to use the QR scanner.</p>
+                                </div>
+                            )}
+                        </div>
+                    </DialogContent>
+                </Dialog>
                 </>
             )}
             {isPast && (
@@ -91,6 +205,7 @@ const getRelativeDate = (days: number) => {
 export default function EventsPage() {
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
   useEffect(() => {
     const now = new Date();
@@ -126,7 +241,8 @@ export default function EventsPage() {
           <CardContent className="p-0">
             <Calendar
               mode="single"
-              selected={new Date()}
+              selected={selectedDate}
+              onSelect={setSelectedDate}
               className="p-3"
               classNames={{
                 day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
@@ -157,3 +273,4 @@ export default function EventsPage() {
     </div>
   );
 }
+
