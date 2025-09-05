@@ -9,7 +9,7 @@ export interface Member {
 export interface Event {
   id: string;
   title: string;
-  date: Date;
+  date: string; // Changed from Date to string
   description: string;
   image: string;
   attendees: number;

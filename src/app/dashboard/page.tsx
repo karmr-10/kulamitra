@@ -28,7 +28,9 @@ import {
 import { mockAnnouncements, mockEvents } from "@/lib/mock-data";
 
 export default function DashboardPage() {
-  const upcomingEvent = mockEvents.sort((a, b) => a.date.getTime() - b.date.getTime())[0];
+  const upcomingEvent = mockEvents.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
+  const upcomingEventDate = new Date(upcomingEvent.date);
+  upcomingEventDate.setUTCHours(0,0,0,0);
 
   return (
     <div className="flex flex-1 flex-col gap-4 md:gap-8">
@@ -57,7 +59,7 @@ export default function DashboardPage() {
           <CardContent>
             <div className="text-2xl font-bold truncate">{upcomingEvent.title}</div>
             <p className="text-xs text-muted-foreground">
-              {upcomingEvent.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}
+              {upcomingEventDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'UTC' })}
             </p>
           </CardContent>
         </Card>

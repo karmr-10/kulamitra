@@ -11,10 +11,11 @@ export const mockMembers: Member[] = [
 const getRelativeDate = (days: number) => {
   const date = new Date();
   date.setDate(date.getDate() + days);
-  return date;
+  return date.toISOString().split('T')[0]; // Return date as 'YYYY-MM-DD' string
 }
 
-const formatRelativeDate = (date: Date) => {
+const formatRelativeDate = (dateString: string) => {
+    const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 

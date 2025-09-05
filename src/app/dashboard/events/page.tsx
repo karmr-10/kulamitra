@@ -18,8 +18,9 @@ function EventCard({ event }: { event: Event }) {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
     const eventDate = new Date(event.date);
-    eventDate.setHours(0, 0, 0, 0);
+    eventDate.setUTCHours(0,0,0,0);
     const isPast = eventDate < now;
+    const formattedDate = eventDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
 
     return (
         <Card key={event.id} className="overflow-hidden">
@@ -34,7 +35,7 @@ function EventCard({ event }: { event: Event }) {
             />
             <div className="absolute inset-0 bg-black/30" />
             <Badge variant="secondary" className="absolute right-4 top-4">
-            {event.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+            {formattedDate}
             </Badge>
         </div>
         <CardHeader>
@@ -83,11 +84,11 @@ export default function EventsPage() {
   
   const upcomingEvents = mockEvents
     .filter(event => new Date(event.date) >= now)
-    .sort((a, b) => a.date.getTime() - b.date.getTime());
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   
   const pastEvents = mockEvents
     .filter(event => new Date(event.date) < now)
-    .sort((a, b) => b.date.getTime() - a.date.getTime());
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
     <div className="grid gap-8 md:grid-cols-3">
