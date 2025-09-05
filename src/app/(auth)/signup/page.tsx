@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -9,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { auth, googleProvider } from "@/lib/firebase";
 import { signInWithPopup } from "firebase/auth";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Smartphone } from "lucide-react";
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -41,34 +44,78 @@ export default function SignupPage() {
           <CardDescription className="font-body">Create your account to connect with the community.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4" onSubmit={handleSignup}>
-             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input id="name" type="text" placeholder="Your Name" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="member@email.com" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required />
-            </div>
-             <div className="space-y-3">
-              <Label>Register as</Label>
-              <RadioGroup defaultValue="member" className="flex items-center gap-4">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="member" id="r-member" />
-                  <Label htmlFor="r-member">Member</Label>
+          <Tabs defaultValue="email">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="email">Email</TabsTrigger>
+              <TabsTrigger value="mobile">Mobile</TabsTrigger>
+            </TabsList>
+            <TabsContent value="email">
+              <form className="space-y-4 pt-4" onSubmit={handleSignup}>
+                <div className="space-y-2">
+                  <Label htmlFor="name-email">Full Name</Label>
+                  <Input id="name-email" type="text" placeholder="Your Name" required />
                 </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="admin" id="r-admin" />
-                  <Label htmlFor="r-admin">Admin</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" placeholder="member@email.com" required />
                 </div>
-              </RadioGroup>
-            </div>
-            <Button type="submit" className="w-full bg-accent hover:bg-accent/90">Create Account</Button>
-          </form>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input id="password" type="password" required />
+                </div>
+                <div className="space-y-3">
+                  <Label>Register as</Label>
+                  <RadioGroup defaultValue="member" className="flex items-center gap-4">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="member" id="r-member-email-signup" />
+                      <Label htmlFor="r-member-email-signup">Member</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="admin" id="r-admin-email-signup" />
+                      <Label htmlFor="r-admin-email-signup">Admin</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                <Button type="submit" className="w-full bg-accent hover:bg-accent/90">Create Account</Button>
+              </form>
+            </TabsContent>
+            <TabsContent value="mobile">
+               <form className="space-y-4 pt-4" onSubmit={handleSignup}>
+                 <div className="space-y-2">
+                    <Label htmlFor="name-mobile">Full Name</Label>
+                    <Input id="name-mobile" type="text" placeholder="Your Name" required />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="mobile-signup">Mobile Number</Label>
+                    <div className="flex gap-2">
+                    <Input id="mobile-signup" type="tel" placeholder="9876543210" required className="flex-1" />
+                    <Button variant="outline">Send OTP</Button>
+                    </div>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="otp-signup">One-Time Password (OTP)</Label>
+                    <Input id="otp-signup" type="text" placeholder="Enter OTP" required />
+                </div>
+                 <div className="space-y-3">
+                  <Label>Register as</Label>
+                  <RadioGroup defaultValue="member" className="flex items-center gap-4">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="member" id="r-member-mobile-signup" />
+                      <Label htmlFor="r-member-mobile-signup">Member</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="admin" id="r-admin-mobile-signup" />
+                      <Label htmlFor="r-admin-mobile-signup">Admin</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                <Button type="submit" className="w-full bg-accent hover:bg-accent/90">
+                    <Smartphone className="mr-2 h-4 w-4" /> Create Account with OTP
+                </Button>
+              </form>
+            </TabsContent>
+          </Tabs>
+
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
