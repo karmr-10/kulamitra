@@ -14,7 +14,7 @@ export const mockEvents: Omit<Event, 'date'>[] = [
     title: 'Annual Ugadi Celebration',
     dateOffset: 15, // Upcoming
     description: 'Join us for a day of cultural programs, traditional food, and community bonding to celebrate Ugadi.',
-    image: 'https://picsum.photos/seed/ugadi/800/400',
+    image: 'https://picsum.photos/seed/indian-festival/800/400',
     attendees: 350,
     capacity: 500
   },
@@ -23,7 +23,7 @@ export const mockEvents: Omit<Event, 'date'>[] = [
     title: 'Blood Donation Camp',
     dateOffset: 30, // Upcoming
     description: 'Be a hero, save a life. Participate in our annual blood donation drive.',
-    image: 'https://picsum.photos/seed/blood-donation/800/400',
+    image: 'https://picsum.photos/seed/charity-event/800/400',
     attendees: 80,
     capacity: 150
   },
@@ -32,7 +32,7 @@ export const mockEvents: Omit<Event, 'date'>[] = [
     title: 'Summer Kids Camp',
     dateOffset: 45, // Upcoming
     description: 'A fun-filled summer camp for kids aged 6-14, with activities like arts, crafts, and sports.',
-    image: 'https://picsum.photos/seed/kids-camp/800/400',
+    image: 'https://picsum.photos/seed/children-playing/800/400',
     attendees: 120,
     capacity: 100
   },
@@ -41,7 +41,7 @@ export const mockEvents: Omit<Event, 'date'>[] = [
     title: 'Diwali Gala Night',
     dateOffset: -60, // Past
     description: 'A spectacular evening celebrating the festival of lights with music, dance, and fireworks.',
-    image: 'https://picsum.photos/seed/diwali-gala/800/400',
+    image: 'https://picsum.photos/seed/diwali-lights/800/400',
     attendees: 450,
     capacity: 500
   },
@@ -50,7 +50,7 @@ export const mockEvents: Omit<Event, 'date'>[] = [
     title: 'Community Sports Day',
     dateOffset: -120, // Past
     description: 'A day of friendly competition and sportsmanship for all age groups.',
-    image: 'https://picsum.photos/seed/sports-day/800/400',
+    image: 'https://picsum.photos/seed/outdoor-sports/800/400',
     attendees: 250,
     capacity: 300
   }
