@@ -40,20 +40,23 @@ export default function SignupPage() {
       router.push("/dashboard");
     } catch (error) {
       console.error("Error signing in with Google", error);
+      toast.error("Failed to sign up with Google. Please try again.");
     }
   };
 
   const onRecaptchaVerify = () => {
     if (!(window as any).recaptchaVerifier) {
       (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container-signup', {
-        'size': 'invisible',
+        'size': 'normal', // Changed to normal for debugging
         'callback': () => {
-          onPhoneNumberSignIn();
+           // reCAPTCHA solved, allow user to send OTP
+           toast.success("reCAPTCHA verified!");
         },
         'expired-callback': () => {
            toast.error("reCAPTCHA expired. Please try again.");
         }
       });
+      (window as any).recaptchaVerifier.render();
     }
   }
 
@@ -68,9 +71,13 @@ export default function SignupPage() {
       setConfirmationResult(confirmation);
       setOtpSent(true);
       toast.success("OTP sent successfully!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("SMS not sent", error);
-      toast.error("Failed to send OTP. Check the number or try again.");
+       if (error.code === 'auth/invalid-phone-number') {
+        toast.error("Invalid phone number. Please include country code (e.g., 91 for India).");
+      } else {
+        toast.error("Failed to send OTP. Please check the number or try again later.");
+      }
     } finally {
       setLoading(false);
     }
@@ -106,7 +113,6 @@ export default function SignupPage() {
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-background p-4">
-      <div id="recaptcha-container-signup"></div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="font-headline text-2xl">Join Kulamitra</CardTitle>
@@ -156,27 +162,17 @@ export default function SignupPage() {
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="mobile-signup">Mobile Number</Label>
-                    <div className="flex gap-2">
-                    <Input 
+                     <Input 
                         id="mobile-signup" 
                         type="tel" 
                         placeholder="919876543210" 
                         required 
-                        className="flex-1"
+                        className="w-full"
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
                         disabled={otpSent || loading}
                     />
-                    <Button 
-                        variant="outline"
-                        type="button"
-                        onClick={onPhoneNumberSignIn}
-                        disabled={loading || !phoneNumber || otpSent}
-                    >
-                        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Send OTP
-                    </Button>
-                    </div>
+                    <p className="text-xs text-muted-foreground">For testing, use numbers configured in Firebase Auth.</p>
                 </div>
                  {otpSent && (
                     <div className="space-y-2">
@@ -192,6 +188,7 @@ export default function SignupPage() {
                         />
                     </div>
                  )}
+                 <div id="recaptcha-container-signup" className="flex justify-center"></div>
                  <div className="space-y-3">
                   <Label>Register as</Label>
                   <RadioGroup defaultValue="member" className="flex items-center gap-4">
@@ -208,7 +205,7 @@ export default function SignupPage() {
                 <Button type="submit" className="w-full bg-accent hover:bg-accent/90" disabled={loading || !phoneNumber || (otpSent && !otp)}>
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     <Smartphone className="mr-2 h-4 w-4" /> 
-                    {otpSent ? "Create Account with OTP" : "Get OTP"}
+                    {otpSent ? "Create Account with OTP" : "Send OTP"}
                 </Button>
               </form>
             </TabsContent>
@@ -238,4 +235,5 @@ export default function SignupPage() {
       </Card>
     </div>
   );
-}
+
+    
