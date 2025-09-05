@@ -10,6 +10,7 @@ import {
   Users,
   Shield,
   UserCheck,
+  Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +36,8 @@ import { useState, useEffect, createContext, useContext } from "react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
 
 type Role = "admin" | "member";
 
@@ -58,6 +61,8 @@ export default function DashboardLayout({
 }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [role, setRole] = useState<Role>("member");
+  const [isVerificationDialogOpen, setIsVerificationDialogOpen] = useState(false);
+  const [pendingRoleChange, setPendingRoleChange] = useState(false);
 
   useEffect(() => {
     const handleScroll = (event: Event) => {
@@ -72,6 +77,26 @@ export default function DashboardLayout({
       mainElement?.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  const handleRoleChange = (checked: boolean) => {
+    if (checked) {
+      setPendingRoleChange(true);
+      setIsVerificationDialogOpen(true);
+    } else {
+      setRole("member");
+    }
+  };
+
+  const handleVerificationConfirm = () => {
+    setRole("admin");
+    setIsVerificationDialogOpen(false);
+    setPendingRoleChange(false);
+  };
+  
+  const handleVerificationCancel = () => {
+    setIsVerificationDialogOpen(false);
+    setPendingRoleChange(false);
+  };
 
 
   return (
@@ -125,7 +150,7 @@ export default function DashboardLayout({
                          <div className="flex items-center space-x-2">
                             <Switch id="role-switch"
                                 checked={role === 'admin'}
-                                onCheckedChange={(checked) => setRole(checked ? 'admin' : 'member')}
+                                onCheckedChange={handleRoleChange}
                             />
                             <Label htmlFor="role-switch" className="text-sm font-medium">
                                 {role === 'admin' ? 'Enabled' : 'Disabled'}
@@ -177,7 +202,7 @@ export default function DashboardLayout({
                     <div className="flex items-center space-x-2">
                         <Switch id="role-switch-mobile"
                             checked={role === 'admin'}
-                            onCheckedChange={(checked) => setRole(checked ? 'admin' : 'member')}
+                            onCheckedChange={handleRoleChange}
                         />
                         <Label htmlFor="role-switch-mobile">
                             Enable Admin View
@@ -196,6 +221,27 @@ export default function DashboardLayout({
           </main>
         </div>
       </div>
+      <AlertDialog open={isVerificationDialogOpen} onOpenChange={ (open) => { if (!open) handleVerificationCancel() }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5" />
+              Admin Verification Required
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              To access administrative features, please enter your password to confirm your identity.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2 py-2">
+            <Label htmlFor="admin-password">Password</Label>
+            <Input id="admin-password" type="password" placeholder="Enter your password" />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleVerificationCancel}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleVerificationConfirm}>Confirm</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </RoleContext.Provider>
   );
 }
