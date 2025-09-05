@@ -1,4 +1,6 @@
 
+"use client";
+
 import Link from "next/link";
 import {
   Bell,
@@ -26,12 +28,31 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MainNav } from "@/components/dashboard/main-nav";
 import { UserNav } from "@/components/dashboard/user-nav";
 import { OmIcon } from "@/components/icons/om-icon";
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = (event: Event) => {
+      const mainContent = event.currentTarget as HTMLElement;
+      setIsScrolled(mainContent.scrollTop > 0);
+    };
+
+    const mainElement = document.querySelector('main');
+    mainElement?.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      mainElement?.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <div className="hidden border-r bg-card md:block">
@@ -84,7 +105,7 @@ export default function DashboardLayout({
         </div>
       </div>
       <div className="flex flex-col">
-        <header className="flex h-14 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6">
+        <header className={cn("flex h-14 items-center gap-4 border-b bg-card px-4 transition-shadow lg:h-[60px] lg:px-6", isScrolled && "shadow-md")}>
           <Sheet>
             <SheetTrigger asChild>
               <Button
@@ -111,7 +132,7 @@ export default function DashboardLayout({
           </div>
           <UserNav />
         </header>
-        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background">
+        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background overflow-y-auto">
           {children}
         </main>
       </div>
