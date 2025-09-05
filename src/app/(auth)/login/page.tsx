@@ -12,7 +12,7 @@ import { auth, googleProvider } from "@/lib/firebase";
 import { signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Smartphone, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -29,40 +29,57 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
 
+  // Effect to set up reCAPTCHA on mount
+  useEffect(() => {
+    // This function will be called by onPhoneNumberSignIn when needed
+  }, []);
+
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    // This is a placeholder for email/password login.
+    // For now, we just redirect. In a real app, you'd verify credentials.
+    toast.success("Email login successful (demo)!");
     router.push("/dashboard");
   };
 
   const handleGoogleSignIn = async () => {
+    setLoading(true);
     try {
       await signInWithPopup(auth, googleProvider);
+      toast.success("Google sign-in successful!");
       router.push("/dashboard");
     } catch (error) {
       console.error("Error signing in with Google", error);
       toast.error("Failed to sign in with Google. Please try again.");
+    } finally {
+        setLoading(false);
     }
   };
 
-  const onRecaptchaVerify = () => {
+  const setupRecaptcha = () => {
     if (!(window as any).recaptchaVerifier) {
-      (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        'size': 'normal', // Changed to normal for debugging
-        'callback': () => {
-          // reCAPTCHA solved, allow user to send OTP
-          toast.success("reCAPTCHA verified!");
-        },
-        'expired-callback': () => {
-          toast.error("reCAPTCHA expired. Please try again.");
-        }
-      });
-      (window as any).recaptchaVerifier.render();
+        (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+            'size': 'normal',
+            'callback': () => {
+                toast.success("reCAPTCHA verified! You can now send the OTP.");
+            },
+            'expired-callback': () => {
+                toast.error("reCAPTCHA expired. Please try again.");
+            }
+        });
+        (window as any).recaptchaVerifier.render();
     }
+  }
+
+  // This effect will run when the mobile tab is selected
+  const handleMobileTabFocus = () => {
+      // Setup reCAPTCHA only when the container is visible to the user
+      setTimeout(setupRecaptcha, 100);
   }
 
   const onPhoneNumberSignIn = async () => {
     setLoading(true);
-    onRecaptchaVerify();
     const appVerifier = (window as any).recaptchaVerifier;
     const formatPh = '+' + phoneNumber;
 
@@ -72,11 +89,11 @@ export default function LoginPage() {
       setOtpSent(true);
       toast.success("OTP sent successfully!");
     } catch (error: any) {
-      console.error("SMS not sent", error);
+      console.error("SMS not sent error:", error);
       if (error.code === 'auth/invalid-phone-number') {
         toast.error("Invalid phone number. Please include country code (e.g., 91 for India).");
       } else {
-        toast.error("Failed to send OTP. Please check the number or try again later.");
+        toast.error("Failed to send OTP. Please check the number or reCAPTCHA and try again.");
       }
     } finally {
       setLoading(false);
@@ -120,7 +137,7 @@ export default function LoginPage() {
           <CardDescription className="font-body">Sign in to access your Kulamitra account.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="email">
+          <Tabs defaultValue="email" onValueChange={(value) => { if (value === 'mobile') { handleMobileTabFocus() }}}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="email">Email</TabsTrigger>
               <TabsTrigger value="mobile">Mobile</TabsTrigger>
@@ -170,7 +187,7 @@ export default function LoginPage() {
                             onChange={(e) => setPhoneNumber(e.target.value)}
                             disabled={otpSent || loading}
                         />
-                         <p className="text-xs text-muted-foreground">For testing, use numbers configured in Firebase Auth.</p>
+                         <p className="text-xs text-muted-foreground">Add country code. Test with numbers in Firebase Auth.</p>
                     </div>
                     {otpSent && (
                         <div className="space-y-2">
@@ -186,7 +203,7 @@ export default function LoginPage() {
                             />
                         </div>
                     )}
-                     <div id="recaptcha-container" className="flex justify-center"></div>
+                     <div id="recaptcha-container" className="flex justify-center my-4"></div>
                     <div className="space-y-3">
                         <Label>Sign in as</Label>
                         <RadioGroup defaultValue="member" className="flex items-center gap-4">
@@ -217,7 +234,8 @@ export default function LoginPage() {
               <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
             </div>
           </div>
-          <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
+          <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={loading}>
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <GoogleIcon className="mr-2 h-5 w-5" />
             Sign in with Google
           </Button>
@@ -233,5 +251,6 @@ export default function LoginPage() {
       </Card>
     </div>
   );
+}
 
-    
+  

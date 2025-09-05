@@ -12,7 +12,7 @@ import { auth, googleProvider } from "@/lib/firebase";
 import { signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Smartphone, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -31,26 +31,32 @@ export default function SignupPage() {
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
+    // This is a placeholder for email/password signup.
+    toast.success("Account created successfully (demo)!");
     router.push("/dashboard");
   };
 
   const handleGoogleSignIn = async () => {
+    setLoading(true);
     try {
       await signInWithPopup(auth, googleProvider);
+      toast.success("Google sign-up successful!");
       router.push("/dashboard");
     } catch (error) {
-      console.error("Error signing in with Google", error);
+      console.error("Error signing up with Google", error);
       toast.error("Failed to sign up with Google. Please try again.");
+    } finally {
+        setLoading(false);
     }
   };
 
-  const onRecaptchaVerify = () => {
+  const setupRecaptcha = () => {
+    // Check if verifier is already initialized
     if (!(window as any).recaptchaVerifier) {
       (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container-signup', {
-        'size': 'normal', // Changed to normal for debugging
+        'size': 'normal',
         'callback': () => {
-           // reCAPTCHA solved, allow user to send OTP
-           toast.success("reCAPTCHA verified!");
+           toast.success("reCAPTCHA verified! You can now send the OTP.");
         },
         'expired-callback': () => {
            toast.error("reCAPTCHA expired. Please try again.");
@@ -60,9 +66,13 @@ export default function SignupPage() {
     }
   }
 
+  const handleMobileTabFocus = () => {
+      // Setup reCAPTCHA only when the container is visible to the user
+      setTimeout(setupRecaptcha, 100);
+  }
+
   const onPhoneNumberSignIn = async () => {
     setLoading(true);
-    onRecaptchaVerify();
     const appVerifier = (window as any).recaptchaVerifier;
     const formatPh = '+' + phoneNumber;
 
@@ -72,11 +82,11 @@ export default function SignupPage() {
       setOtpSent(true);
       toast.success("OTP sent successfully!");
     } catch (error: any) {
-      console.error("SMS not sent", error);
+      console.error("SMS not sent error:", error);
        if (error.code === 'auth/invalid-phone-number') {
         toast.error("Invalid phone number. Please include country code (e.g., 91 for India).");
       } else {
-        toast.error("Failed to send OTP. Please check the number or try again later.");
+        toast.error("Failed to send OTP. Please check the number or reCAPTCHA and try again.");
       }
     } finally {
       setLoading(false);
@@ -119,7 +129,7 @@ export default function SignupPage() {
           <CardDescription className="font-body">Create your account to connect with the community.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="email">
+          <Tabs defaultValue="email" onValueChange={(value) => { if (value === 'mobile') { handleMobileTabFocus() }}}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="email">Email</TabsTrigger>
               <TabsTrigger value="mobile">Mobile</TabsTrigger>
@@ -172,7 +182,7 @@ export default function SignupPage() {
                         onChange={(e) => setPhoneNumber(e.target.value)}
                         disabled={otpSent || loading}
                     />
-                    <p className="text-xs text-muted-foreground">For testing, use numbers configured in Firebase Auth.</p>
+                    <p className="text-xs text-muted-foreground">Add country code. Test with numbers in Firebase Auth.</p>
                 </div>
                  {otpSent && (
                     <div className="space-y-2">
@@ -188,7 +198,7 @@ export default function SignupPage() {
                         />
                     </div>
                  )}
-                 <div id="recaptcha-container-signup" className="flex justify-center"></div>
+                 <div id="recaptcha-container-signup" className="flex justify-center my-4"></div>
                  <div className="space-y-3">
                   <Label>Register as</Label>
                   <RadioGroup defaultValue="member" className="flex items-center gap-4">
@@ -219,7 +229,8 @@ export default function SignupPage() {
               <span className="bg-card px-2 text-muted-foreground">Or sign up with</span>
             </div>
           </div>
-          <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
+          <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={loading}>
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <GoogleIcon className="mr-2 h-5 w-5" />
             Sign up with Google
           </Button>
@@ -235,5 +246,6 @@ export default function SignupPage() {
       </Card>
     </div>
   );
+}
 
-    
+  
