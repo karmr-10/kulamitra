@@ -9,9 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { auth, googleProvider } from "@/lib/firebase";
-import { signInWithPopup } from "firebase/auth";
+import { signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Smartphone } from "lucide-react";
+import { Smartphone, Loader2 } from "lucide-react";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -21,6 +23,11 @@ function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
 
 export default function SignupPage() {
   const router = useRouter();
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [otp, setOtp] = useState('');
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,8 +43,70 @@ export default function SignupPage() {
     }
   };
 
+  const onRecaptchaVerify = () => {
+    if (!(window as any).recaptchaVerifier) {
+      (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container-signup', {
+        'size': 'invisible',
+        'callback': () => {
+          onPhoneNumberSignIn();
+        },
+        'expired-callback': () => {
+           toast.error("reCAPTCHA expired. Please try again.");
+        }
+      });
+    }
+  }
+
+  const onPhoneNumberSignIn = async () => {
+    setLoading(true);
+    onRecaptchaVerify();
+    const appVerifier = (window as any).recaptchaVerifier;
+    const formatPh = '+' + phoneNumber;
+
+    try {
+      const confirmation = await signInWithPhoneNumber(auth, formatPh, appVerifier);
+      setConfirmationResult(confirmation);
+      setOtpSent(true);
+      toast.success("OTP sent successfully!");
+    } catch (error) {
+      console.error("SMS not sent", error);
+      toast.error("Failed to send OTP. Check the number or try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const onOtpVerify = async () => {
+    setLoading(true);
+    try {
+      if (!confirmationResult) {
+            toast.error("OTP confirmation not available. Please request a new OTP.");
+            setLoading(false);
+            return;
+      }
+      await confirmationResult.confirm(otp);
+      toast.success("Account created successfully!");
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error verifying OTP", error);
+      toast.error("Invalid OTP. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMobileSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (otpSent) {
+      onOtpVerify();
+    } else {
+      onPhoneNumberSignIn();
+    }
+  }
+
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-background p-4">
+      <div id="recaptcha-container-signup"></div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="font-headline text-2xl">Join Kulamitra</CardTitle>
@@ -80,7 +149,7 @@ export default function SignupPage() {
               </form>
             </TabsContent>
             <TabsContent value="mobile">
-               <form className="space-y-4 pt-4" onSubmit={handleSignup}>
+               <form className="space-y-4 pt-4" onSubmit={handleMobileSubmit}>
                  <div className="space-y-2">
                     <Label htmlFor="name-mobile">Full Name</Label>
                     <Input id="name-mobile" type="text" placeholder="Your Name" required />
@@ -88,14 +157,41 @@ export default function SignupPage() {
                 <div className="space-y-2">
                     <Label htmlFor="mobile-signup">Mobile Number</Label>
                     <div className="flex gap-2">
-                    <Input id="mobile-signup" type="tel" placeholder="9876543210" required className="flex-1" />
-                    <Button variant="outline">Send OTP</Button>
+                    <Input 
+                        id="mobile-signup" 
+                        type="tel" 
+                        placeholder="919876543210" 
+                        required 
+                        className="flex-1"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        disabled={otpSent || loading}
+                    />
+                    <Button 
+                        variant="outline"
+                        type="button"
+                        onClick={onPhoneNumberSignIn}
+                        disabled={loading || !phoneNumber || otpSent}
+                    >
+                        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Send OTP
+                    </Button>
                     </div>
                 </div>
-                <div className="space-y-2">
-                    <Label htmlFor="otp-signup">One-Time Password (OTP)</Label>
-                    <Input id="otp-signup" type="text" placeholder="Enter OTP" required />
-                </div>
+                 {otpSent && (
+                    <div className="space-y-2">
+                        <Label htmlFor="otp-signup">One-Time Password (OTP)</Label>
+                        <Input 
+                            id="otp-signup" 
+                            type="text" 
+                            placeholder="Enter OTP" 
+                            required
+                            value={otp}
+                            onChange={(e) => setOtp(e.target.value)}
+                            disabled={loading}
+                        />
+                    </div>
+                 )}
                  <div className="space-y-3">
                   <Label>Register as</Label>
                   <RadioGroup defaultValue="member" className="flex items-center gap-4">
@@ -109,8 +205,10 @@ export default function SignupPage() {
                     </div>
                   </RadioGroup>
                 </div>
-                <Button type="submit" className="w-full bg-accent hover:bg-accent/90">
-                    <Smartphone className="mr-2 h-4 w-4" /> Create Account with OTP
+                <Button type="submit" className="w-full bg-accent hover:bg-accent/90" disabled={loading || !phoneNumber || (otpSent && !otp)}>
+                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    <Smartphone className="mr-2 h-4 w-4" /> 
+                    {otpSent ? "Create Account with OTP" : "Get OTP"}
                 </Button>
               </form>
             </TabsContent>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster as ShadToaster } from "@/components/ui/toaster";
+import { Toaster as HotToaster } from "react-hot-toast";
 import BackgroundWatermark from "@/components/background-watermark";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -30,7 +31,8 @@ export default function RootLayout({
         >
           <BackgroundWatermark />
           {children}
-          <Toaster />
+          <ShadToaster />
+          <HotToaster />
         </ThemeProvider>
       </body>
     </html>
