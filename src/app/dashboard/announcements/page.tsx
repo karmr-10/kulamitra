@@ -8,12 +8,15 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Megaphone } from "lucide-react";
+import { PlusCircle, Megaphone, Edit, Trash2 } from "lucide-react";
 import { Announcement } from "@/lib/types";
+import { useRole } from "../layout";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 const getRelativeDate = (days: number) => {
   const date = new Date();
@@ -27,6 +30,7 @@ const formatRelativeDate = (dateString: string) => {
 };
 
 export default function AnnouncementsPage() {
+  const { role } = useRole();
   const [announcements, setAnnouncements] = useState<Omit<Announcement, 'dateOffset'>[]>([]);
 
   useEffect(() => {
@@ -53,10 +57,12 @@ export default function AnnouncementsPage() {
             </p>
           </div>
         </div>
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          New Announcement
-        </Button>
+        {role === 'admin' && (
+            <Button>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                New Announcement
+            </Button>
+        )}
       </div>
 
       <div className="mt-8 grid gap-6">
@@ -78,6 +84,26 @@ export default function AnnouncementsPage() {
             <CardContent>
               <p className="font-body text-foreground/90">{announcement.content}</p>
             </CardContent>
+            {role === 'admin' && (
+                <CardFooter className="flex justify-end gap-2">
+                    <Button variant="outline"><Edit className="mr-2 h-4 w-4" /> Edit</Button>
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="destructive"><Trash2 className="mr-2 h-4 w-4" /> Delete</Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogDescription>This action cannot be undone. This will permanently delete the announcement.</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction>Delete</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                </CardFooter>
+            )}
           </Card>
         ))}
       </div>

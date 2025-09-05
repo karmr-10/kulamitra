@@ -15,14 +15,16 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { mockEvents } from "@/lib/mock-data";
-import { CheckCircle, Users, MapPin, HandHelping, QrCode, Camera, AlertTriangle } from "lucide-react";
+import { CheckCircle, Users, MapPin, HandHelping, QrCode, Camera, AlertTriangle, PlusCircle, Trash2, Edit } from "lucide-react";
 import { Event } from "@/lib/types";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { useRole } from "../layout";
 
 function EventCard({ event }: { event: Event }) {
+    const { role } = useRole();
     const now = new Date();
     now.setHours(0, 0, 0, 0);
     const eventDate = new Date(event.date);
@@ -113,7 +115,7 @@ function EventCard({ event }: { event: Event }) {
             </div>
         </CardContent>
         <CardFooter className="flex gap-2">
-            {!isPast && (
+            {!isPast && role === 'member' && (
                 <>
                 <Dialog onOpenChange={(open) => setDialogOpen(open ? "rsvp" : null)}>
                   <DialogTrigger asChild>
@@ -160,38 +162,58 @@ function EventCard({ event }: { event: Event }) {
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
-
-
-                <Dialog onOpenChange={(open) => setDialogOpen(open ? "track" : null)}>
-                    <DialogTrigger asChild>
-                       <Button variant="outline" className="ml-auto">
-                            <QrCode className="mr-2 h-4 w-4" /> Track Attendance
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Track Event Attendance</DialogTitle>
-                             <DialogDescription>
-                                Position the guest's QR code within the frame to scan and track attendance.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="relative aspect-video w-full overflow-hidden rounded-md border bg-muted">
-                           <video ref={videoRef} className="h-full w-full object-cover" autoPlay playsInline muted />
-                           <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="h-2/3 w-2/3 rounded-lg border-4 border-dashed border-primary" />
-                           </div>
-                           {hasCameraPermission === false && (
-                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 text-white p-4">
-                                   <Camera className="h-12 w-12 text-destructive mb-4" />
-                                    <h3 className="text-lg font-bold">Camera Access Required</h3>
-                                    <p className="text-center text-sm">Please grant camera permissions in your browser settings to use the QR scanner.</p>
-                                </div>
-                            )}
-                        </div>
-                    </DialogContent>
-                </Dialog>
                 </>
             )}
+
+            {!isPast && role === 'admin' && (
+                <>
+                    <Button variant="outline"><Edit className="mr-2 h-4 w-4" /> Edit</Button>
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="destructive"><Trash2 className="mr-2 h-4 w-4" /> Delete</Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogDescription>This action cannot be undone. This will permanently delete the event.</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction>Delete</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                    <Dialog onOpenChange={(open) => setDialogOpen(open ? "track" : null)}>
+                        <DialogTrigger asChild>
+                           <Button variant="outline" className="ml-auto">
+                                <QrCode className="mr-2 h-4 w-4" /> Track Attendance
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Track Event Attendance</DialogTitle>
+                                 <DialogDescription>
+                                    Position the guest's QR code within the frame to scan and track attendance.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="relative aspect-video w-full overflow-hidden rounded-md border bg-muted">
+                               <video ref={videoRef} className="h-full w-full object-cover" autoPlay playsInline muted />
+                               <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="h-2/3 w-2/3 rounded-lg border-4 border-dashed border-primary" />
+                               </div>
+                               {hasCameraPermission === false && (
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 text-white p-4">
+                                       <Camera className="h-12 w-12 text-destructive mb-4" />
+                                        <h3 className="text-lg font-bold">Camera Access Required</h3>
+                                        <p className="text-center text-sm">Please grant camera permissions in your browser settings to use the QR scanner.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+                </>
+            )}
+
             {isPast && (
                 <Button variant="outline" disabled>
                     View Gallery
@@ -209,6 +231,7 @@ const getRelativeDate = (days: number) => {
 };
 
 export default function EventsPage() {
+  const { role } = useRole();
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -237,12 +260,23 @@ export default function EventsPage() {
   return (
     <div className="grid gap-8 md:grid-cols-3">
       <div className="md:col-span-1">
-        <h1 className="font-headline text-3xl font-bold tracking-tight">
-          Community Events
-        </h1>
-        <p className="text-muted-foreground">
-          Find and join upcoming community events.
-        </p>
+        <div className="flex items-center justify-between">
+            <div>
+                 <h1 className="font-headline text-3xl font-bold tracking-tight">
+                    Community Events
+                </h1>
+                <p className="text-muted-foreground">
+                    Find and join upcoming community events.
+                </p>
+            </div>
+             {role === 'admin' && (
+                <Button size="sm">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    New Event
+                </Button>
+            )}
+        </div>
+       
         <Card className="mt-6">
           <CardContent className="p-0">
             <Calendar

@@ -7,12 +7,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
   CardContent,
+  CardFooter
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, PlusCircle, UserPlus, CheckCircle, Edit, Trash2 } from "lucide-react";
 import { Member } from "@/lib/types";
+import { useRole } from "../layout";
+import { Button } from "@/components/ui/button";
 
 export default function MembersPage() {
+  const { role } = useRole();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredMembers, setFilteredMembers] = useState<Member[]>(mockMembers);
 
@@ -34,14 +38,22 @@ export default function MembersPage() {
             Browse and connect with members of the community.
           </p>
         </div>
-        <div className="relative w-full max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input 
-            placeholder="Search members..." 
-            className="pl-10" 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="flex items-center gap-4">
+            <div className="relative w-full max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Input 
+                placeholder="Search members..." 
+                className="pl-10" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            </div>
+            {role === 'admin' && (
+                <Button>
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    New Member
+                </Button>
+            )}
         </div>
       </div>
 
@@ -57,6 +69,13 @@ export default function MembersPage() {
               <p className="text-sm text-muted-foreground">{member.role}</p>
               <p className="mt-2 text-xs text-muted-foreground">Joined: {member.joined}</p>
             </CardContent>
+            {role === 'admin' && (
+                <CardFooter className="flex justify-center gap-2 p-4 pt-0">
+                    {member.role !== 'Admin' && <Button variant="outline" size="sm"><CheckCircle className="mr-1 h-4 w-4" /> Approve</Button>}
+                    <Button variant="outline" size="sm"><Edit className="mr-1 h-4 w-4" /> Edit</Button>
+                    <Button variant="destructive" size="sm"><Trash2 className="mr-1 h-4 w-4" /> Remove</Button>
+                </CardFooter>
+            )}
           </Card>
         ))}
       </div>
