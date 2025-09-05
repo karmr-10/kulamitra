@@ -47,7 +47,7 @@ export default function GalleryPage() {
 
       <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {mockGalleryItems.map((item) => (
-          <Card key={item.id} className="overflow-hidden group !p-0">
+          <Card key={item.id} className="overflow-hidden group !p-0 hover:border-primary">
             <CardHeader className="p-0">
                <AspectRatio ratio={4 / 3}>
                 <Image
