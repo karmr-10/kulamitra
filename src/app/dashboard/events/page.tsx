@@ -1,3 +1,7 @@
+
+"use client";
+
+import { useState, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
@@ -85,21 +89,29 @@ const getRelativeDate = (days: number) => {
 };
 
 export default function EventsPage() {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
+  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
+  const [pastEvents, setPastEvents] = useState<Event[]>([]);
 
-  const eventsWithRelativeDates = mockEvents.map(event => ({
-    ...event,
-    date: getRelativeDate(event.dateOffset)
-  }));
-  
-  const upcomingEvents = eventsWithRelativeDates
-    .filter(event => new Date(event.date) >= now)
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  
-  const pastEvents = eventsWithRelativeDates
-    .filter(event => new Date(event.date) < now)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  useEffect(() => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    const eventsWithRelativeDates = mockEvents.map(event => ({
+      ...event,
+      date: getRelativeDate(event.dateOffset)
+    }));
+    
+    const upcoming = eventsWithRelativeDates
+      .filter(event => new Date(event.date) >= now)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    
+    const past = eventsWithRelativeDates
+      .filter(event => new Date(event.date) < now)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    setUpcomingEvents(upcoming);
+    setPastEvents(past);
+  }, []);
 
   return (
     <div className="grid gap-8 md:grid-cols-3">

@@ -1,3 +1,7 @@
+
+"use client";
+
+import { useState, useEffect } from "react";
 import { mockAnnouncements } from "@/lib/mock-data";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -9,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Megaphone } from "lucide-react";
+import { Announcement } from "@/lib/types";
 
 const getRelativeDate = (days: number) => {
   const date = new Date();
@@ -22,12 +27,15 @@ const formatRelativeDate = (dateString: string) => {
 };
 
 export default function AnnouncementsPage() {
+  const [announcements, setAnnouncements] = useState<Omit<Announcement, 'dateOffset'>[]>([]);
 
-  const announcementsWithRelativeDates = mockAnnouncements.map(announcement => ({
-    ...announcement,
-    date: formatRelativeDate(getRelativeDate(announcement.dateOffset))
-  }));
-
+  useEffect(() => {
+    const announcementsWithRelativeDates = mockAnnouncements.map(announcement => ({
+      ...announcement,
+      date: formatRelativeDate(getRelativeDate(announcement.dateOffset))
+    }));
+    setAnnouncements(announcementsWithRelativeDates);
+  }, []);
 
   return (
     <div>
@@ -52,7 +60,7 @@ export default function AnnouncementsPage() {
       </div>
 
       <div className="mt-8 grid gap-6">
-        {announcementsWithRelativeDates.map((announcement) => (
+        {announcements.map((announcement) => (
           <Card key={announcement.id}>
             <CardHeader>
               <div className="flex items-center justify-between">

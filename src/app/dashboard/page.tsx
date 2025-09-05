@@ -1,3 +1,7 @@
+
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Activity,
@@ -26,6 +30,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { mockAnnouncements, mockEvents } from "@/lib/mock-data";
+import { Event, Announcement } from "@/lib/types";
 
 const getRelativeDate = (days: number) => {
   const date = new Date();
@@ -39,19 +44,28 @@ const formatRelativeDate = (dateString: string) => {
 };
 
 export default function DashboardPage() {
-  const eventsWithRelativeDates = mockEvents.map(event => ({
-    ...event,
-    date: getRelativeDate(event.dateOffset)
-  }));
-  const upcomingEvent = eventsWithRelativeDates.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
-  const upcomingEventDate = new Date(upcomingEvent.date);
-  upcomingEventDate.setUTCHours(0,0,0,0);
+  const [upcomingEvent, setUpcomingEvent] = useState<Event | null>(null);
+  const [upcomingEventDate, setUpcomingEventDate] = useState<Date | null>(null);
+  const [announcements, setAnnouncements] = useState<Omit<Announcement, 'dateOffset'>[]>([]);
 
-  const announcementsWithRelativeDates = mockAnnouncements.map(announcement => ({
-    ...announcement,
-    date: formatRelativeDate(getRelativeDate(announcement.dateOffset))
-  }));
+  useEffect(() => {
+    const eventsWithRelativeDates = mockEvents.map(event => ({
+      ...event,
+      date: getRelativeDate(event.dateOffset)
+    }));
+    const sortedUpcomingEvent = eventsWithRelativeDates.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
+    setUpcomingEvent(sortedUpcomingEvent);
 
+    const eventDate = new Date(sortedUpcomingEvent.date);
+    eventDate.setUTCHours(0,0,0,0);
+    setUpcomingEventDate(eventDate);
+
+    const announcementsWithRelativeDates = mockAnnouncements.map(announcement => ({
+      ...announcement,
+      date: formatRelativeDate(getRelativeDate(announcement.dateOffset))
+    }));
+    setAnnouncements(announcementsWithRelativeDates);
+  }, []);
 
   return (
     <div className="flex flex-1 flex-col gap-4 md:gap-8">
@@ -78,9 +92,9 @@ export default function DashboardPage() {
             <CalendarCheck2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold truncate">{upcomingEvent.title}</div>
+            <div className="text-2xl font-bold truncate">{upcomingEvent?.title || 'Loading...'}</div>
             <p className="text-xs text-muted-foreground">
-              {upcomingEventDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'UTC' })}
+              {upcomingEventDate ? upcomingEventDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'UTC' }) : '...'}
             </p>
           </CardContent>
         </Card>
@@ -139,7 +153,7 @@ export default function DashboardPage() {
             <CardTitle className="font-headline">Recent Announcements</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-8">
-            {announcementsWithRelativeDates.slice(0, 3).map((announcement) => (
+            {announcements.slice(0, 3).map((announcement) => (
               <div key={announcement.id} className="flex items-center gap-4">
                 <Avatar className="hidden h-9 w-9 sm:flex">
                   <AvatarImage data-ai-hint="male avatar" src="https://picsum.photos/seed/announce-author/100" alt="Avatar" />
