@@ -13,10 +13,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Megaphone, Edit, Trash2 } from "lucide-react";
+import { PlusCircle, Megaphone, Edit, Trash2, CalendarIcon, Clock } from "lucide-react";
 import { Announcement } from "@/lib/types";
 import { useRole } from "../layout";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const getRelativeDate = (days: number) => {
   const date = new Date();
@@ -32,6 +41,7 @@ const formatRelativeDate = (dateString: string) => {
 export default function AnnouncementsPage() {
   const { role } = useRole();
   const [announcements, setAnnouncements] = useState<Omit<Announcement, 'dateOffset'>[]>([]);
+  const [date, setDate] = useState<Date | undefined>(new Date());
 
   useEffect(() => {
     const announcementsWithRelativeDates = mockAnnouncements.map(announcement => ({
@@ -58,10 +68,72 @@ export default function AnnouncementsPage() {
           </div>
         </div>
         {role === 'admin' && (
-            <Button>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                New Announcement
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    New Announcement
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-xl">
+                <DialogHeader>
+                    <DialogTitle className="font-headline text-2xl">Create New Announcement</DialogTitle>
+                    <DialogDescription>
+                        Draft and publish a new announcement to the community.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-6 py-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="title">Announcement Title</Label>
+                        <Input id="title" placeholder="e.g., Annual General Meeting" className="text-lg"/>
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea id="description" placeholder="Provide a detailed description of the announcement..." rows={5}/>
+                    </div>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                             <Label htmlFor="date">Date</Label>
+                             <Popover>
+                                <PopoverTrigger asChild>
+                                <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                    "w-full justify-start text-left font-normal",
+                                    !date && "text-muted-foreground"
+                                    )}
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {date ? format(date, "PPP") : <span>Pick a date</span>}
+                                </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                    mode="single"
+                                    selected={date}
+                                    onSelect={setDate}
+                                    initialFocus
+                                />
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+                         <div className="space-y-2">
+                            <Label htmlFor="time">Time</Label>
+                            <Input id="time" type="time" />
+                        </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <Checkbox id="add-to-calendar" />
+                        <Label htmlFor="add-to-calendar" className="font-normal">
+                           Include "Add to Calendar" option for members
+                        </Label>
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button type="submit" size="lg">Create Announcement</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
         )}
       </div>
 
@@ -110,3 +182,5 @@ export default function AnnouncementsPage() {
     </div>
   );
 }
+
+    
