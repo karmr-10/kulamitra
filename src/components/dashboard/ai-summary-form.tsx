@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormStatus } from "react-dom";
 import { onGenerate } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useEffect } from "react";
+import { useEffect, useActionState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal } from "lucide-react";
@@ -32,7 +32,7 @@ export function AiSummaryForm() {
   const initialState = {
     message: "",
   };
-  const [state, formAction] = useFormState(onGenerate, initialState);
+  const [state, formAction] = useActionState(onGenerate, initialState);
 
   useEffect(() => {
     if (state.message && state.message.startsWith('Error')) {
