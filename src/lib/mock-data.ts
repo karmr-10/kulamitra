@@ -8,10 +8,9 @@ export const mockMembers: Member[] = [
   { id: '5', name: 'Ramesh Babu', avatar: 'https://picsum.photos/seed/ramesh/100', role: 'Member', joined: '2022-05-25' },
 ];
 
-const today = new Date();
 const getRelativeDate = (days: number) => {
-  const date = new Date(today);
-  date.setDate(today.getDate() + days);
+  const date = new Date();
+  date.setDate(date.getDate() + days);
   return date;
 }
 

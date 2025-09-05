@@ -12,9 +12,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { mockEvents } from "@/lib/mock-data";
 import { CheckCircle, Users, MapPin, HandHelping, QrCode } from "lucide-react";
+import { Event } from "@/lib/types";
 
-function EventCard({ event }: { event: typeof mockEvents[0] }) {
-    const isPast = event.date < new Date();
+function EventCard({ event }: { event: Event }) {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const eventDate = new Date(event.date);
+    eventDate.setHours(0, 0, 0, 0);
+    const isPast = eventDate < now;
+
     return (
         <Card key={event.id} className="overflow-hidden">
         <div className="relative h-48 w-full">
@@ -22,7 +28,7 @@ function EventCard({ event }: { event: typeof mockEvents[0] }) {
             src={event.image}
             alt={event.title}
             fill
-            objectFit="cover"
+            style={{objectFit: 'cover'}}
             className={isPast ? "grayscale" : ""}
             data-ai-hint="community event"
             />
@@ -73,8 +79,15 @@ function EventCard({ event }: { event: typeof mockEvents[0] }) {
 
 export default function EventsPage() {
   const now = new Date();
-  const upcomingEvents = mockEvents.filter(event => event.date >= now).sort((a, b) => a.date.getTime() - b.date.getTime());
-  const pastEvents = mockEvents.filter(event => event.date < now).sort((a, b) => b.date.getTime() - a.date.getTime());
+  now.setHours(0, 0, 0, 0);
+  
+  const upcomingEvents = mockEvents
+    .filter(event => new Date(event.date) >= now)
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
+  
+  const pastEvents = mockEvents
+    .filter(event => new Date(event.date) < now)
+    .sort((a, b) => b.date.getTime() - a.date.getTime());
 
   return (
     <div className="grid gap-8 md:grid-cols-3">
