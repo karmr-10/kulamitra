@@ -27,7 +27,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MainNav } from "@/components/dashboard/main-nav";
 import { UserNav } from "@/components/dashboard/user-nav";
-import { OmIcon } from "@/components/icons/om-icon";
+import { KAVMLogo } from "@/components/icons/om-icon";
 import { useState, useEffect, createContext, useContext } from "react";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
@@ -107,7 +107,7 @@ export default function DashboardLayout({
           <div className="flex h-full max-h-screen flex-col gap-2">
             <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
               <Link href="/dashboard" className="flex items-center gap-2 font-headline font-semibold">
-                <OmIcon className="h-6 w-6 text-primary" />
+                <KAVMLogo className="h-8 w-8 text-primary" />
                 <span className="">Kulamitra</span>
               </Link>
               <DropdownMenu>
@@ -194,7 +194,7 @@ export default function DashboardLayout({
               <SheetContent side="left" className="flex flex-col p-0 bg-card">
                 <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
                   <Link href="/dashboard" className="flex items-center gap-2 font-headline font-semibold">
-                    <OmIcon className="h-6 w-6 text-primary" />
+                    <KAVMLogo className="h-8 w-8 text-primary" />
                     <span className="">Kulamitra</span>
                   </Link>
                 </div>
@@ -256,5 +256,3 @@ export default function DashboardLayout({
     </RoleContext.Provider>
   );
 }
-
-    
