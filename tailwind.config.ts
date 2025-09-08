@@ -19,8 +19,8 @@ const config = {
     },
     extend: {
       fontFamily: {
-        headline: ['"Playfair Display"', 'serif'],
-        body: ['"PT Sans"', 'sans-serif'],
+        headline: ['var(--font-playfair-display)', 'serif'],
+        body: ['var(--font-pt-sans)', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

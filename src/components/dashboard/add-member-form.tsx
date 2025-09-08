@@ -182,3 +182,5 @@ export function AddMemberForm({ onSave }: { onSave: () => void }) {
     </form>
   );
 }
+
+export { AddMemberForm };

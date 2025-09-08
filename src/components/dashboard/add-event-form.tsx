@@ -178,3 +178,4 @@ export function AddEventForm({ onSave }: { onSave: () => void }) {
     );
 }
 
+export { AddEventForm };

@@ -4,6 +4,21 @@ import { Toaster as HotToaster } from "react-hot-toast";
 import BackgroundWatermark from "@/components/background-watermark";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Playfair_Display, PT_Sans } from 'next/font/google';
+import { cn } from "@/lib/utils";
+
+const playfairDisplay = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-playfair-display',
+  weight: ['400', '700'],
+});
+
+const ptSans = PT_Sans({
+  subsets: ['latin'],
+  variable: '--font-pt-sans',
+  weight: ['400', '700'],
+});
+
 
 export const metadata: Metadata = {
   title: "Kulamitra",
@@ -17,12 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
-      </head>
-      <body className="font-body antialiased">
+      <body className={cn("font-body antialiased", playfairDisplay.variable, ptSans.variable)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

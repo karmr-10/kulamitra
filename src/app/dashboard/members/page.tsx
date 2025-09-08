@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { mockMembers } from "@/lib/mock-data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -15,8 +15,9 @@ import { Member } from "@/lib/types";
 import { useRole } from "../layout";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { AddMemberForm } from "@/components/dashboard/add-member-form";
 import toast from "react-hot-toast";
+
+const AddMemberForm = lazy(() => import("@/components/dashboard/add-member-form").then(module => ({ default: module.AddMemberForm })));
 
 export default function MembersPage() {
   const { role } = useRole();
@@ -67,7 +68,9 @@ export default function MembersPage() {
                               Enter the details for the new member and their family. Click save when you're done.
                           </DialogDescription>
                       </DialogHeader>
-                      <AddMemberForm onSave={() => setIsFormOpen(false)} />
+                      <Suspense fallback={<div>Loading form...</div>}>
+                        <AddMemberForm onSave={() => setIsFormOpen(false)} />
+                      </Suspense>
                   </DialogContent>
                 </Dialog>
             )}
@@ -109,5 +112,3 @@ export default function MembersPage() {
     </div>
   );
 }
-
-    

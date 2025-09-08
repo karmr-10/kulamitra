@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
@@ -23,7 +23,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { useRole } from "../layout";
 import toast from "react-hot-toast";
-import { AddEventForm } from "@/components/dashboard/add-event-form";
+
+const AddEventForm = lazy(() => import("@/components/dashboard/add-event-form").then(module => ({ default: module.AddEventForm })));
+
 
 function EventCard({ event, isPast, formattedDate }: { event: Event, isPast: boolean, formattedDate: string | null }) {
     const { role } = useRole();
@@ -297,7 +299,9 @@ export default function EventsPage() {
                             Fill in the details below to create a new event for the community.
                         </DialogDescription>
                     </DialogHeader>
-                    <AddEventForm onSave={handleEventAdded} />
+                    <Suspense fallback={<div>Loading form...</div>}>
+                        <AddEventForm onSave={handleEventAdded} />
+                    </Suspense>
                 </DialogContent>
               </Dialog>
             )}
