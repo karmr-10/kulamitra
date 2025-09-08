@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,6 +41,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export function AddMemberForm({ onSave }: { onSave: () => void }) {
+  const router = useRouter();
   const [numPeople, setNumPeople] = useState(1);
   const {
     register,
@@ -76,8 +78,17 @@ export function AddMemberForm({ onSave }: { onSave: () => void }) {
 
   const processSubmit = (data: FormData) => {
     console.log(data);
-    toast.success("New member and family added successfully!");
-    onSave();
+    // In a real app, you'd save this to a DB and get an ID.
+    // For this prototype, we'll save to localStorage to pass to the preview page.
+    try {
+      localStorage.setItem('newFamilyData', JSON.stringify(data));
+      toast.success("New member and family added successfully!");
+      onSave(); // This will close the dialog
+      router.push('/dashboard/members/preview');
+    } catch (error) {
+      toast.error("Could not save family data for preview.");
+      console.error(error);
+    }
   };
 
   return (
