@@ -29,6 +29,24 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab] = useState('email');
+
+  useEffect(() => {
+    if (activeTab !== 'mobile') return;
+    
+    if (!(window as any).recaptchaVerifier && recaptchaContainerRef.current) {
+        (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainerRef.current, {
+            'size': 'normal',
+            'callback': () => {
+                toast.success("reCAPTCHA verified! You can now send the OTP.");
+            },
+            'expired-callback': () => {
+                toast.error("reCAPTCHA expired. Please try again.");
+            }
+        });
+        (window as any).recaptchaVerifier.render();
+    }
+  }, [activeTab]);
 
 
   const handleLogin = (e: React.FormEvent) => {
@@ -51,25 +69,6 @@ export default function LoginPage() {
     }
   };
 
-  const setupRecaptcha = () => {
-    if (!(window as any).recaptchaVerifier && recaptchaContainerRef.current) {
-        (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container-login', {
-            'size': 'normal',
-            'callback': () => {
-                toast.success("reCAPTCHA verified! You can now send the OTP.");
-            },
-            'expired-callback': () => {
-                toast.error("reCAPTCHA expired. Please try again.");
-            }
-        });
-        (window as any).recaptchaVerifier.render();
-    }
-  }
-
-  const handleMobileTabFocus = () => {
-      setTimeout(setupRecaptcha, 200); // Small delay to ensure container is rendered
-  }
-
   const onPhoneNumberSignIn = async () => {
     setLoading(true);
     if (!(window as any).recaptchaVerifier) {
@@ -90,6 +89,8 @@ export default function LoginPage() {
       console.error("SMS not sent error:", error);
       if (error.code === 'auth/invalid-phone-number') {
         toast.error("Invalid phone number. Please include country code (e.g., 91 for India).");
+      } else if (error.code === 'auth/billing-not-enabled') {
+        toast.error("SMS sending is not enabled for this project. Please enable billing in your Firebase console.");
       } else {
         toast.error("Failed to send OTP. Please check the number or reCAPTCHA and try again.");
       }
@@ -135,7 +136,7 @@ export default function LoginPage() {
           <CardDescription className="font-body">Sign in to access your Kulamitra account.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="email" onValueChange={(value) => { if (value === 'mobile') { handleMobileTabFocus() }}}>
+          <Tabs defaultValue="email" onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="email">Email</TabsTrigger>
               <TabsTrigger value="mobile">Mobile</TabsTrigger>
