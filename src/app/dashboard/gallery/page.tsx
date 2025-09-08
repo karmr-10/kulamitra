@@ -63,10 +63,11 @@ export default function GalleryPage() {
 
       <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {mockGalleryItems.map((item) => (
-          <Card key={item.id} className="overflow-hidden group !p-0">
+          <Card key={item.id} className="overflow-hidden group !p-0 relative">
              {role === 'admin' && (
                 <Button variant="destructive" size="icon" className="absolute right-2 top-2 z-10 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">Delete photo</span>
                 </Button>
              )}
             <CardHeader className="p-0">
@@ -74,8 +75,8 @@ export default function GalleryPage() {
                 <Image
                   src={item.imageUrl}
                   alt={item.description}
-                  layout="fill"
-                  objectFit="cover"
+                  fill
+                  style={{objectFit: 'cover'}}
                   className="transition-transform duration-300 group-hover:scale-105"
                   data-ai-hint="community photo"
                 />

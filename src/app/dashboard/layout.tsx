@@ -4,12 +4,8 @@
 import Link from "next/link";
 import {
   Bell,
-  Home,
   Menu,
-  Package2,
-  Users,
   Shield,
-  UserCheck,
   Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -46,13 +42,15 @@ interface RoleContextType {
   setRole: (role: Role) => void;
 }
 
-export const RoleContext = createContext<RoleContextType>({
-  role: "member",
-  setRole: () => {},
-});
+const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
-export const useRole = () => useContext(RoleContext);
-
+export const useRole = () => {
+  const context = useContext(RoleContext);
+  if (!context) {
+    throw new Error("useRole must be used within a RoleProvider");
+  }
+  return context;
+};
 
 export default function DashboardLayout({
   children,
@@ -62,7 +60,8 @@ export default function DashboardLayout({
   const [isScrolled, setIsScrolled] = useState(false);
   const [role, setRole] = useState<Role>("member");
   const [isVerificationDialogOpen, setIsVerificationDialogOpen] = useState(false);
-  const [pendingRoleChange, setPendingRoleChange] = useState(false);
+  const [isSwitchChecked, setIsSwitchChecked] = useState(false);
+
 
   useEffect(() => {
     const handleScroll = (event: Event) => {
@@ -77,10 +76,13 @@ export default function DashboardLayout({
       mainElement?.removeEventListener('scroll', handleScroll);
     };
   }, []);
+  
+  useEffect(() => {
+    setIsSwitchChecked(role === 'admin');
+  }, [role]);
 
   const handleRoleChange = (checked: boolean) => {
     if (checked) {
-      setPendingRoleChange(true);
       setIsVerificationDialogOpen(true);
     } else {
       setRole("member");
@@ -90,12 +92,10 @@ export default function DashboardLayout({
   const handleVerificationConfirm = () => {
     setRole("admin");
     setIsVerificationDialogOpen(false);
-    setPendingRoleChange(false);
   };
   
   const handleVerificationCancel = () => {
     setIsVerificationDialogOpen(false);
-    setPendingRoleChange(false);
   };
 
 
@@ -149,7 +149,7 @@ export default function DashboardLayout({
                     <CardContent className="p-4 pt-0">
                          <div className="flex items-center space-x-2">
                             <Switch id="role-switch"
-                                checked={role === 'admin'}
+                                checked={isSwitchChecked}
                                 onCheckedChange={handleRoleChange}
                             />
                             <Label htmlFor="role-switch" className="text-sm font-medium">
@@ -199,15 +199,25 @@ export default function DashboardLayout({
                 </div>
                 <MainNav className="p-4" />
                  <div className="p-4 mt-auto">
-                    <div className="flex items-center space-x-2">
-                        <Switch id="role-switch-mobile"
-                            checked={role === 'admin'}
-                            onCheckedChange={handleRoleChange}
-                        />
-                        <Label htmlFor="role-switch-mobile">
-                            Enable Admin View
-                        </Label>
-                    </div>
+                    <Card>
+                        <CardHeader className="p-4 pb-2">
+                            <CardTitle className="font-headline text-base flex items-center gap-2">
+                                <Shield className="h-4 w-4" />
+                                Admin View
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-4 pt-0">
+                            <div className="flex items-center space-x-2">
+                                <Switch id="role-switch-mobile"
+                                    checked={isSwitchChecked}
+                                    onCheckedChange={handleRoleChange}
+                                />
+                                <Label htmlFor="role-switch-mobile" className="text-sm">
+                                    {role === 'admin' ? 'Enabled' : 'Disabled'}
+                                </Label>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
               </SheetContent>
             </Sheet>

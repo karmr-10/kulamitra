@@ -78,7 +78,11 @@ export default function DashboardPage() {
       return <Skeleton className="h-8 w-64" />;
     }
     if (user) {
-      return `Welcome back, ${user.displayName || 'Friend'}!`;
+      const name = user.displayName || 'Friend';
+      if (role === 'admin') {
+          return `Welcome, Admin ${name}!`;
+      }
+      return `Welcome back, ${name}!`;
     }
     return "Welcome to your Dashboard!";
   }
@@ -162,12 +166,14 @@ export default function DashboardPage() {
                 A quick-read summary of recent community activities, powered by AI.
               </CardDescription>
             </div>
-            <Button asChild size="sm" className="ml-auto gap-1">
-              <Link href="/dashboard/ai-summary">
-                Generate
-                <ArrowUpRight className="h-4 w-4" />
-              </Link>
-            </Button>
+            {role === 'admin' && (
+              <Button asChild size="sm" className="ml-auto gap-1">
+                <Link href="/dashboard/ai-summary">
+                  Generate
+                  <ArrowUpRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            )}
           </CardHeader>
           <CardContent>
             <div className="prose prose-sm prose-p:font-body text-foreground max-w-none rounded-lg border bg-muted/50 p-4">
@@ -180,6 +186,9 @@ export default function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle className="font-headline">Recent Announcements</CardTitle>
+            <CardDescription>
+                The latest 3 announcements from the community.
+            </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-8">
             {announcements.slice(0, 3).map((announcement) => (

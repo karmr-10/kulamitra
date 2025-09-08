@@ -270,9 +270,9 @@ export default function EventsPage() {
                 </p>
             </div>
              {role === 'admin' && (
-                <Button size="sm">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    New Event
+                <Button size="icon" className="shrink-0">
+                    <PlusCircle className="h-5 w-5" />
+                    <span className="sr-only">New Event</span>
                 </Button>
             )}
         </div>

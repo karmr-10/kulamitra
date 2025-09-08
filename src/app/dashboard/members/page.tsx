@@ -29,7 +29,7 @@ export default function MembersPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="font-headline text-3xl font-bold tracking-tight">
             Community Members
@@ -39,7 +39,7 @@ export default function MembersPage() {
           </p>
         </div>
         <div className="flex items-center gap-4">
-            <div className="relative w-full max-w-sm">
+            <div className="relative w-full max-w-sm hidden md:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input 
                 placeholder="Search members..." 
@@ -57,6 +57,16 @@ export default function MembersPage() {
         </div>
       </div>
 
+      <div className="mt-4 relative w-full max-w-sm md:hidden">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+        <Input 
+            placeholder="Search members..." 
+            className="pl-10" 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
       <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filteredMembers.map((member) => (
           <Card key={member.id}>
@@ -69,9 +79,9 @@ export default function MembersPage() {
               <p className="text-sm text-muted-foreground">{member.role}</p>
               <p className="mt-2 text-xs text-muted-foreground">Joined: {member.joined}</p>
             </CardContent>
-            {role === 'admin' && (
+            {role === 'admin' && member.role !== 'Admin' && (
                 <CardFooter className="flex justify-center gap-2 p-4 pt-0">
-                    {member.role !== 'Admin' && <Button variant="outline" size="sm"><CheckCircle className="mr-1 h-4 w-4" /> Approve</Button>}
+                    <Button variant="outline" size="sm"><CheckCircle className="mr-1 h-4 w-4" /> Approve</Button>
                     <Button variant="outline" size="sm"><Edit className="mr-1 h-4 w-4" /> Edit</Button>
                     <Button variant="destructive" size="sm"><Trash2 className="mr-1 h-4 w-4" /> Remove</Button>
                 </CardFooter>
