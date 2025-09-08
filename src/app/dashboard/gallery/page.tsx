@@ -2,6 +2,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRef } from "react";
 import { mockGalleryItems } from "@/lib/mock-data";
 import {
   Card,
@@ -22,12 +23,25 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { useRole } from "../layout";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Trash2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import toast from "react-hot-toast";
 
 export default function GalleryPage() {
   const { role } = useRole();
   const years = [...new Set(mockGalleryItems.map(item => item.year))];
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAddPhotosClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      // In a real app, you would handle the file upload process here.
+      // For this demo, we'll just show a success message.
+      toast.success(`${files.length} photo(s) selected and ready for upload.`);
+    }
+  };
 
   return (
     <div>
@@ -54,10 +68,20 @@ export default function GalleryPage() {
                 </Select>
             </div>
             {role === 'admin' && (
-                <Button onClick={() => toast.error("Adding photos is not yet implemented.")}>
+              <>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  multiple
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+                <Button onClick={handleAddPhotosClick}>
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Add Photos
                 </Button>
+              </>
             )}
         </div>
       </div>
@@ -96,5 +120,3 @@ export default function GalleryPage() {
     </div>
   );
 }
-
-    
