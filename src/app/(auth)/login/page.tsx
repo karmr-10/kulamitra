@@ -32,9 +32,9 @@ export default function LoginPage() {
   const [activeTab, setActiveTab] = useState('email');
 
   useEffect(() => {
-    if (activeTab !== 'mobile') return;
+    if (activeTab !== 'mobile' || (window as any).recaptchaVerifier) return;
     
-    if (!(window as any).recaptchaVerifier && recaptchaContainerRef.current) {
+    if (recaptchaContainerRef.current) {
         (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainerRef.current, {
             'size': 'normal',
             'callback': () => {
@@ -89,8 +89,6 @@ export default function LoginPage() {
       console.error("SMS not sent error:", error);
       if (error.code === 'auth/invalid-phone-number') {
         toast.error("Invalid phone number. Please include country code (e.g., 91 for India).");
-      } else if (error.code === 'auth/billing-not-enabled') {
-        toast.error("SMS sending is not enabled for this project. Please enable billing in your Firebase console.");
       } else {
         toast.error("Failed to send OTP. Please check the number or reCAPTCHA and try again.");
       }

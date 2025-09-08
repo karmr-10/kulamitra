@@ -20,7 +20,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Users, Calendar, TrendingUp, Landmark, FileText, CheckCircle } from "lucide-react";
+import { Users, Calendar, TrendingUp, Landmark, CheckCircle } from "lucide-react";
 import { useState } from "react";
 
 const chitFunds = [
