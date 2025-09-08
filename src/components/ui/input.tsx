@@ -4,17 +4,6 @@ import { cn } from "@/lib/utils"
 
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, type, ...props }, ref) => {
-    const [isMounted, setIsMounted] = React.useState(false)
-
-    React.useEffect(() => {
-      setIsMounted(true)
-    }, [])
-
-    if (!isMounted) {
-      // Render nothing on the server to avoid hydration mismatch
-      return null
-    }
-    
     return (
       <input
         type={type}
