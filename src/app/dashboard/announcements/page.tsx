@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Megaphone, Edit, Trash2, CalendarIcon, Clock } from "lucide-react";
+import { PlusCircle, Megaphone, Edit, Trash2, CalendarIcon } from "lucide-react";
 import { Announcement } from "@/lib/types";
 import { useRole } from "../layout";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -26,6 +26,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
+import toast from "react-hot-toast";
 
 const getRelativeDate = (days: number) => {
   const date = new Date();
@@ -44,6 +45,10 @@ export default function AnnouncementsPage() {
     mockAnnouncements.map(a => ({...a, date: null}))
   );
   const [date, setDate] = useState<Date | undefined>(new Date());
+  
+  const handleCreate = () => {
+    toast.success("New announcement created successfully (demo)!");
+  }
 
   useEffect(() => {
     const announcementsWithRelativeDates = mockAnnouncements.map(announcement => ({
@@ -132,7 +137,7 @@ export default function AnnouncementsPage() {
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button type="submit" size="lg">Create Announcement</Button>
+                    <Button type="submit" size="lg" onClick={handleCreate}>Create Announcement</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -160,7 +165,7 @@ export default function AnnouncementsPage() {
             </CardContent>
             {role === 'admin' && (
                 <CardFooter className="flex justify-end gap-2">
-                    <Button variant="outline"><Edit className="mr-2 h-4 w-4" /> Edit</Button>
+                    <Button variant="outline" onClick={() => toast.error("Editing announcements is not yet implemented.")}><Edit className="mr-2 h-4 w-4" /> Edit</Button>
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
                             <Button variant="destructive"><Trash2 className="mr-2 h-4 w-4" /> Delete</Button>
@@ -184,3 +189,5 @@ export default function AnnouncementsPage() {
     </div>
   );
 }
+
+    

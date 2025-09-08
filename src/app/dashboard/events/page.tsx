@@ -22,6 +22,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { useRole } from "../layout";
+import toast from "react-hot-toast";
 
 function EventCard({ event, isPast, formattedDate }: { event: Event, isPast: boolean, formattedDate: string | null }) {
     const { role } = useRole();
@@ -29,7 +30,7 @@ function EventCard({ event, isPast, formattedDate }: { event: Event, isPast: boo
     const [volunteering, setVolunteering] = useState(false);
     const [dialogOpen, setDialogOpen] = useState<"rsvp" | "track" | null>(null);
 
-    const { toast } = useToast();
+    const { toast: shadToast } = useToast();
     const videoRef = useRef<HTMLVideoElement>(null);
     const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
 
@@ -52,7 +53,7 @@ function EventCard({ event, isPast, formattedDate }: { event: Event, isPast: boo
           } catch (error) {
             console.error('Error accessing camera:', error);
             setHasCameraPermission(false);
-            toast({
+            shadToast({
               variant: 'destructive',
               title: 'Camera Access Denied',
               description: 'Please enable camera permissions in your browser settings to track attendance.',
@@ -69,7 +70,7 @@ function EventCard({ event, isPast, formattedDate }: { event: Event, isPast: boo
             stream.getTracks().forEach(track => track.stop());
         }
       }
-    }, [dialogOpen, toast]);
+    }, [dialogOpen, shadToast]);
 
 
     return (
@@ -131,7 +132,7 @@ function EventCard({ event, isPast, formattedDate }: { event: Event, isPast: boo
                           <p className="text-center text-sm text-muted-foreground">Show this QR code at the event entrance for check-in.</p>
                       </div>
                       <DialogFooter className="sm:justify-center">
-                          <Button type="button" variant="default" onClick={() => { setRsvpd(true); setDialogOpen(null); toast({ title: "RSVP Successful!", description: `See you at ${event.title}!`}) }}>
+                          <Button type="button" variant="default" onClick={() => { setRsvpd(true); setDialogOpen(null); shadToast({ title: "RSVP Successful!", description: `See you at ${event.title}!`}) }}>
                               Confirm RSVP
                           </Button>
                       </DialogFooter>
@@ -154,7 +155,7 @@ function EventCard({ event, isPast, formattedDate }: { event: Event, isPast: boo
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                         <AlertDialogCancel>Drop</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => {setVolunteering(true); toast({title: "Thank you for volunteering!", description: "We've added you to the volunteer list."})}}>Confirm</AlertDialogAction>
+                        <AlertDialogAction onClick={() => {setVolunteering(true); shadToast({title: "Thank you for volunteering!", description: "We've added you to the volunteer list."})}}>Confirm</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
@@ -163,7 +164,7 @@ function EventCard({ event, isPast, formattedDate }: { event: Event, isPast: boo
 
             {!isPast && role === 'admin' && (
                 <>
-                    <Button variant="outline"><Edit className="mr-2 h-4 w-4" /> Edit</Button>
+                    <Button variant="outline" onClick={() => toast.error("Editing events is not yet implemented.")}><Edit className="mr-2 h-4 w-4" /> Edit</Button>
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
                             <Button variant="destructive"><Trash2 className="mr-2 h-4 w-4" /> Delete</Button>
@@ -275,7 +276,7 @@ export default function EventsPage() {
                 </p>
             </div>
              {role === 'admin' && (
-                <Button size="icon" className="shrink-0">
+                <Button size="icon" className="shrink-0" onClick={() => toast.error("Creating new events is not yet implemented.")}>
                     <PlusCircle className="h-5 w-5" />
                     <span className="sr-only">New Event</span>
                 </Button>
@@ -318,3 +319,5 @@ export default function EventsPage() {
     </div>
   );
 }
+
+    

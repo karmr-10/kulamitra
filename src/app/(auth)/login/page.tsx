@@ -148,9 +148,9 @@ export default function LoginPage() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password">Password</Label>
-                    <Link href="#" className="text-sm font-medium text-primary hover:underline">
+                    <button type="button" onClick={() => toast.error('Forgot password feature is not yet implemented.')} className="text-sm font-medium text-primary hover:underline">
                       Forgot password?
-                    </Link>
+                    </button>
                   </div>
                   <Input id="password" type="password" required />
                 </div>
@@ -249,3 +249,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+    

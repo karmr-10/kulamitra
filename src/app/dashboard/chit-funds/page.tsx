@@ -31,7 +31,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Users, Calendar, TrendingUp, Landmark, CheckCircle, PlusCircle, Trash2 } from "lucide-react";
+import { Users, Calendar, TrendingUp, Landmark, CheckCircle, PlusCircle, Trash2, Edit } from "lucide-react";
 import { useState } from "react";
 import { useRole } from "../layout";
 import { Input } from "@/components/ui/input";
@@ -124,6 +124,8 @@ export default function ChitFundsPage() {
   const [chitFunds, setChitFunds] = useState<ChitFund[]>(initialChitFunds);
   const [selectedFund, setSelectedFund] = useState<ChitFund | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false);
+
 
   const handleAddFund = (newFundData: Omit<ChitFund, 'id' | 'status'>) => {
     const newFund: ChitFund = {
@@ -139,6 +141,14 @@ export default function ChitFundsPage() {
   const handleDeleteFund = (fundId: string) => {
     setChitFunds(prev => prev.filter(fund => fund.id !== fundId));
     toast.success("ChitFund scheme deleted. A notification would be sent to all members.");
+  }
+  
+  const handleJoinConfirm = () => {
+    if (selectedFund) {
+        toast.success(`You have successfully joined the ${selectedFund.name} chit fund!`);
+        setIsJoinDialogOpen(false);
+        setSelectedFund(null);
+    }
   }
 
 
@@ -232,12 +242,12 @@ export default function ChitFundsPage() {
             </CardContent>
             <CardFooter className="flex items-center gap-2">
               {role === 'member' && (
-                <Dialog onOpenChange={(open) => !open && setSelectedFund(null)}>
+                <Dialog open={isJoinDialogOpen && selectedFund?.id === fund.id} onOpenChange={(open) => {if (!open) { setSelectedFund(null); setIsJoinDialogOpen(false); } }}>
                     <DialogTrigger asChild>
                     <Button 
                         className="w-full" 
                         disabled={fund.status !== 'Open'}
-                        onClick={() => setSelectedFund(fund)}
+                        onClick={() => {setSelectedFund(fund); setIsJoinDialogOpen(true);}}
                     >
                         Join Now
                     </Button>
@@ -264,8 +274,8 @@ export default function ChitFundsPage() {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button type="button" variant="secondary">Cancel</Button>
-                        <Button type="button">
+                        <Button type="button" variant="secondary" onClick={() => setIsJoinDialogOpen(false)}>Cancel</Button>
+                        <Button type="button" onClick={handleJoinConfirm}>
                             <CheckCircle className="mr-2 h-4 w-4" />
                             Confirm & Proceed
                         </Button>
@@ -275,7 +285,7 @@ export default function ChitFundsPage() {
               )}
                {role === 'admin' && (
                  <>
-                    <Button variant="outline" className="w-full">Edit Scheme</Button>
+                    <Button variant="outline" className="w-full" onClick={() => toast.error('Editing chit fund schemes is not yet implemented.')}><Edit className="mr-2 h-4 w-4" /> Edit</Button>
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
                             <Button variant="destructive" size="icon"><Trash2 className="h-4 w-4" /></Button>
@@ -302,3 +312,5 @@ export default function ChitFundsPage() {
     </div>
   );
 }
+
+    

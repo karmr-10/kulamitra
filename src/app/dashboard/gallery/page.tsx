@@ -23,6 +23,7 @@ import { useRole } from "../layout";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import toast from "react-hot-toast";
 
 export default function GalleryPage() {
   const { role } = useRole();
@@ -53,7 +54,7 @@ export default function GalleryPage() {
                 </Select>
             </div>
             {role === 'admin' && (
-                <Button>
+                <Button onClick={() => toast.error("Adding photos is not yet implemented.")}>
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Add Photos
                 </Button>
@@ -65,7 +66,7 @@ export default function GalleryPage() {
         {mockGalleryItems.map((item) => (
           <Card key={item.id} className="overflow-hidden group !p-0 relative">
              {role === 'admin' && (
-                <Button variant="destructive" size="icon" className="absolute right-2 top-2 z-10 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button variant="destructive" size="icon" className="absolute right-2 top-2 z-10 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => toast.success("Photo deleted successfully (demo).")}>
                     <Trash2 className="h-4 w-4" />
                     <span className="sr-only">Delete photo</span>
                 </Button>
@@ -95,3 +96,5 @@ export default function GalleryPage() {
     </div>
   );
 }
+
+    

@@ -118,6 +118,7 @@ export default function ProfilePage() {
                 </Avatar>
                 <Button type="button" size="icon" className="absolute bottom-0 right-0 rounded-full" onClick={handleAvatarChange}>
                   <Camera className="h-4 w-4" />
+                  <span className="sr-only">Change avatar</span>
                 </Button>
               </div>
                <div className="text-sm text-muted-foreground">
@@ -152,3 +153,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+    

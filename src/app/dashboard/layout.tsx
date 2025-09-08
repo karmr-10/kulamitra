@@ -34,6 +34,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
+import toast from "react-hot-toast";
 
 type Role = "admin" | "member";
 
@@ -169,7 +170,7 @@ export default function DashboardLayout({
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
-                  <Button size="sm" className="w-full">
+                  <Button size="sm" className="w-full" onClick={() => toast.error("Support contact is not yet configured.")}>
                     Contact Support
                   </Button>
                 </CardContent>
@@ -255,3 +256,5 @@ export default function DashboardLayout({
     </RoleContext.Provider>
   );
 }
+
+    

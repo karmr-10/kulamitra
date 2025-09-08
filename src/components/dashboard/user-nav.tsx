@@ -26,6 +26,7 @@ import { Moon, Sun } from "lucide-react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/lib/firebase";
 import { Skeleton } from "@/components/ui/skeleton";
+import toast from "react-hot-toast";
 
 export function UserNav() {
   const router = useRouter();
@@ -69,7 +70,7 @@ export function UserNav() {
           <DropdownMenuItem onClick={() => router.push('/dashboard/profile')}>
             Profile
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => toast.error("Settings page is not yet implemented.")}>
             Settings
           </DropdownMenuItem>
         </DropdownMenuGroup>
@@ -102,3 +103,5 @@ export function UserNav() {
     </DropdownMenu>
   );
 }
+
+    

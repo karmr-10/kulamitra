@@ -16,6 +16,7 @@ import { useRole } from "../layout";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AddMemberForm } from "@/components/dashboard/add-member-form";
+import toast from "react-hot-toast";
 
 export default function MembersPage() {
   const { role } = useRole();
@@ -97,9 +98,9 @@ export default function MembersPage() {
             </CardContent>
             {role === 'admin' && member.role !== 'Admin' && (
                 <CardFooter className="flex justify-center gap-2 p-4 pt-0">
-                    <Button variant="outline" size="sm"><CheckCircle className="mr-1 h-4 w-4" /> Approve</Button>
-                    <Button variant="outline" size="sm"><Edit className="mr-1 h-4 w-4" /> Edit</Button>
-                    <Button variant="destructive" size="sm"><Trash2 className="mr-1 h-4 w-4" /> Remove</Button>
+                    <Button variant="outline" size="sm" onClick={() => toast.success(`${member.name} has been approved.`)}><CheckCircle className="mr-1 h-4 w-4" /> Approve</Button>
+                    <Button variant="outline" size="sm" onClick={() => toast.error(`Editing ${member.name} is not yet implemented.`)}><Edit className="mr-1 h-4 w-4" /> Edit</Button>
+                    <Button variant="destructive" size="sm" onClick={() => toast.success(`${member.name} has been removed.`)}><Trash2 className="mr-1 h-4 w-4" /> Remove</Button>
                 </CardFooter>
             )}
           </Card>
@@ -108,3 +109,5 @@ export default function MembersPage() {
     </div>
   );
 }
+
+    
