@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,11 @@ const splashSteps = [
 export function SplashScreen() {
   const [step, setStep] = useState(0);
   const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleNext = () => {
     if (step < splashSteps.length - 1) {
@@ -44,6 +49,10 @@ export function SplashScreen() {
   const handleSkip = () => {
     router.push("/login");
   };
+
+  if (!isMounted) {
+    return null;
+  }
 
   const currentStep = splashSteps[step];
   const isLastStep = step === splashSteps.length - 1;
