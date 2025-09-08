@@ -32,20 +32,24 @@ export default function LoginPage() {
   const [activeTab, setActiveTab] = useState('email');
 
   useEffect(() => {
-    if (activeTab !== 'mobile' || (window as any).recaptchaVerifier) return;
+    if (activeTab !== 'mobile') return;
     
-    if (recaptchaContainerRef.current) {
-        (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainerRef.current, {
-            'size': 'normal',
-            'callback': () => {
-                toast.success("reCAPTCHA verified! You can now send the OTP.");
-            },
-            'expired-callback': () => {
-                toast.error("reCAPTCHA expired. Please try again.");
-            }
-        });
-        (window as any).recaptchaVerifier.render();
-    }
+    const recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainerRef.current!, {
+        'size': 'normal',
+        'callback': () => {
+            toast.success("reCAPTCHA verified! You can now send the OTP.");
+        },
+        'expired-callback': () => {
+            toast.error("reCAPTCHA expired. Please try again.");
+        }
+    });
+
+    (window as any).recaptchaVerifier = recaptchaVerifier;
+    recaptchaVerifier.render();
+
+    return () => {
+      recaptchaVerifier.clear();
+    };
   }, [activeTab]);
 
 

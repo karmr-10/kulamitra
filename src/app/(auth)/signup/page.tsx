@@ -34,8 +34,7 @@ export default function SignupPage() {
   useEffect(() => {
     if (activeTab !== 'mobile') return;
 
-    if (!(window as any).recaptchaVerifier && recaptchaContainerRef.current) {
-      (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainerRef.current, {
+    const recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainerRef.current!, {
         'size': 'normal',
         'callback': () => {
            toast.success("reCAPTCHA verified! You can now send the OTP.");
@@ -43,9 +42,14 @@ export default function SignupPage() {
         'expired-callback': () => {
            toast.error("reCAPTCHA expired. Please try again.");
         }
-      });
-      (window as any).recaptchaVerifier.render();
-    }
+    });
+
+    (window as any).recaptchaVerifier = recaptchaVerifier;
+    recaptchaVerifier.render();
+
+    return () => {
+      recaptchaVerifier.clear();
+    };
   }, [activeTab]);
 
 
@@ -252,3 +256,5 @@ export default function SignupPage() {
     </div>
   );
 }
+
+    
