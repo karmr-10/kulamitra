@@ -23,6 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { useRole } from "../layout";
 import toast from "react-hot-toast";
+import { AddEventForm } from "@/components/dashboard/add-event-form";
 
 function EventCard({ event, isPast, formattedDate }: { event: Event, isPast: boolean, formattedDate: string | null }) {
     const { role } = useRole();
@@ -240,6 +241,7 @@ export default function EventsPage() {
       }))
   );
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [isAddEventOpen, setIsAddEventOpen] = useState(false);
 
   useEffect(() => {
     const now = new Date();
@@ -262,6 +264,11 @@ export default function EventsPage() {
   const upcomingEvents = events.filter(e => !e.isPast).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   const pastEvents = events.filter(e => e.isPast).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
+  const handleEventAdded = () => {
+    setIsAddEventOpen(false);
+    toast.success("New event created successfully!");
+  }
+
 
   return (
     <div className="grid gap-8 md:grid-cols-3">
@@ -276,10 +283,23 @@ export default function EventsPage() {
                 </p>
             </div>
              {role === 'admin' && (
-                <Button size="icon" className="shrink-0" onClick={() => toast.error("Creating new events is not yet implemented.")}>
-                    <PlusCircle className="h-5 w-5" />
-                    <span className="sr-only">New Event</span>
-                </Button>
+               <Dialog open={isAddEventOpen} onOpenChange={setIsAddEventOpen}>
+                <DialogTrigger asChild>
+                  <Button size="icon" className="shrink-0">
+                      <PlusCircle className="h-5 w-5" />
+                      <span className="sr-only">New Event</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="font-headline text-2xl">Create New Event</DialogTitle>
+                        <DialogDescription>
+                            Fill in the details below to create a new event for the community.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <AddEventForm onSave={handleEventAdded} />
+                </DialogContent>
+              </Dialog>
             )}
         </div>
        
@@ -319,5 +339,3 @@ export default function EventsPage() {
     </div>
   );
 }
-
-    
