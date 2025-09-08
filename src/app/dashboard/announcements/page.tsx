@@ -41,16 +41,17 @@ const formatRelativeDate = (dateString: string) => {
 
 export default function AnnouncementsPage() {
   const { role } = useRole();
-  const [announcements, setAnnouncements] = useState<Omit<Announcement, 'dateOffset' | 'date'>[] & { date: string | null }>(
-    mockAnnouncements.map(a => ({...a, date: null}))
-  );
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [announcements, setAnnouncements] = useState<Omit<Announcement, 'dateOffset' | 'date'>[] & { date: string | null }>([]);
+  const [date, setDate] = useState<Date | undefined>(undefined);
   
   const handleCreate = () => {
     toast.success("New announcement created successfully (demo)!");
   }
 
   useEffect(() => {
+    // Set date on client-side to avoid hydration mismatch
+    setDate(new Date());
+
     const announcementsWithRelativeDates = mockAnnouncements.map(announcement => ({
       ...announcement,
       date: formatRelativeDate(getRelativeDate(announcement.dateOffset))
@@ -189,5 +190,3 @@ export default function AnnouncementsPage() {
     </div>
   );
 }
-
-    

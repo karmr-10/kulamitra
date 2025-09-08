@@ -234,18 +234,14 @@ type ProcessedEvent = Event & { isPast: boolean; formattedDate: string | null };
 
 export default function EventsPage() {
   const { role } = useRole();
-  const [events, setEvents] = useState<ProcessedEvent[]>(
-      mockEvents.map(e => ({
-          ...e,
-          date: getRelativeDate(e.dateOffset),
-          isPast: new Date(getRelativeDate(e.dateOffset)) < new Date(),
-          formattedDate: null
-      }))
-  );
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [events, setEvents] = useState<ProcessedEvent[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [isAddEventOpen, setIsAddEventOpen] = useState(false);
 
   useEffect(() => {
+    // Set selectedDate on client-side to avoid hydration mismatch
+    setSelectedDate(new Date());
+
     const now = new Date();
     now.setHours(0, 0, 0, 0);
 
