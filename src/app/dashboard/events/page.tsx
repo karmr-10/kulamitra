@@ -35,8 +35,8 @@ function EventCard({ event, isPast, formattedDate }: { event: Event, isPast: boo
 
 
     useEffect(() => {
-      if (dialogOpen === 'track') {
-        const getCameraPermission = async () => {
+      const getCameraPermission = async () => {
+        if (dialogOpen === 'track') {
           if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             console.error("Camera API not available in this browser.");
             setHasCameraPermission(false);
@@ -58,10 +58,13 @@ function EventCard({ event, isPast, formattedDate }: { event: Event, isPast: boo
               description: 'Please enable camera permissions in your browser settings to track attendance.',
             });
           }
-        };
-        getCameraPermission();
-      } else {
-        if (videoRef.current && videoRef.current.srcObject) {
+        }
+      };
+      
+      getCameraPermission();
+
+      return () => {
+         if (videoRef.current && videoRef.current.srcObject) {
             const stream = videoRef.current.srcObject as MediaStream;
             stream.getTracks().forEach(track => track.stop());
         }
@@ -227,7 +230,14 @@ type ProcessedEvent = Event & { isPast: boolean; formattedDate: string | null };
 
 export default function EventsPage() {
   const { role } = useRole();
-  const [events, setEvents] = useState<ProcessedEvent[]>([]);
+  const [events, setEvents] = useState<ProcessedEvent[]>(
+      mockEvents.map(e => ({
+          ...e,
+          date: getRelativeDate(e.dateOffset),
+          isPast: new Date(getRelativeDate(e.dateOffset)) < new Date(),
+          formattedDate: null
+      }))
+  );
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
   useEffect(() => {
