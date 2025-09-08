@@ -1,5 +1,7 @@
+
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,6 +16,12 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Heart } from "lucide-react";
 
 export default function DonatePage() {
+  const [amount, setAmount] = useState("");
+
+  const handleAmountButtonClick = (presetAmount: number) => {
+    setAmount(presetAmount.toString());
+  };
+
   return (
     <div className="flex justify-center py-8">
       <Card className="w-full max-w-2xl">
@@ -31,12 +39,19 @@ export default function DonatePage() {
             <Label htmlFor="amount" className="text-lg">Amount (INR)</Label>
             <div className="relative">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-lg text-muted-foreground">₹</span>
-                <Input id="amount" type="number" placeholder="Enter amount" className="h-12 pl-8 text-lg" />
+                <Input 
+                  id="amount" 
+                  type="number" 
+                  placeholder="Enter amount" 
+                  className="h-12 pl-8 text-lg" 
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                />
             </div>
           </div>
           <div className="flex gap-2">
-            {[101, 501, 1001, 2001].map(amount => (
-                <Button key={amount} variant="outline" className="flex-1">₹{amount}</Button>
+            {[101, 501, 1001, 2001].map(presetAmount => (
+                <Button key={presetAmount} variant="outline" className="flex-1" onClick={() => handleAmountButtonClick(presetAmount)}>₹{presetAmount}</Button>
             ))}
           </div>
 
