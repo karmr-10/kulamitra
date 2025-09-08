@@ -65,16 +65,20 @@ export default function DashboardLayout({
 
 
   useEffect(() => {
-    const handleScroll = (event: Event) => {
-      const mainContent = event.currentTarget as HTMLElement;
-      setIsScrolled(mainContent.scrollTop > 0);
+    const mainElement = document.querySelector('main');
+    if (!mainElement) return;
+
+    const handleScroll = () => {
+      setIsScrolled(mainElement.scrollTop > 0);
     };
 
-    const mainElement = document.querySelector('main');
-    mainElement?.addEventListener('scroll', handleScroll);
+    mainElement.addEventListener('scroll', handleScroll);
     
+    // Set initial state
+    handleScroll();
+
     return () => {
-      mainElement?.removeEventListener('scroll', handleScroll);
+      mainElement.removeEventListener('scroll', handleScroll);
     };
   }, []);
   
