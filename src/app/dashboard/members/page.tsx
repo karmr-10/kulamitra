@@ -10,15 +10,18 @@ import {
   CardFooter
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search, PlusCircle, UserPlus, CheckCircle, Edit, Trash2 } from "lucide-react";
+import { Search, UserPlus, CheckCircle, Edit, Trash2 } from "lucide-react";
 import { Member } from "@/lib/types";
 import { useRole } from "../layout";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AddMemberForm } from "@/components/dashboard/add-member-form";
 
 export default function MembersPage() {
   const { role } = useRole();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredMembers, setFilteredMembers] = useState<Member[]>(mockMembers);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   useEffect(() => {
     const results = mockMembers.filter((member) =>
@@ -49,10 +52,23 @@ export default function MembersPage() {
             />
             </div>
             {role === 'admin' && (
-                <Button>
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    New Member
-                </Button>
+                <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+                  <DialogTrigger asChild>
+                    <Button>
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        New Member
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                          <DialogTitle className="font-headline text-2xl">Add New Community Member</DialogTitle>
+                          <DialogDescription>
+                              Enter the details for the new member and their family. Click save when you're done.
+                          </DialogDescription>
+                      </DialogHeader>
+                      <AddMemberForm onSave={() => setIsFormOpen(false)} />
+                  </DialogContent>
+                </Dialog>
             )}
         </div>
       </div>
