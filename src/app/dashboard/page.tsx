@@ -54,9 +54,7 @@ export default function DashboardPage() {
   const { role } = useRole();
   const [upcomingEvent, setUpcomingEvent] = useState<Event | null>(null);
   const [upcomingEventDateString, setUpcomingEventDateString] = useState<string | null>(null);
-  const [announcements, setAnnouncements] = useState<AnnouncementWithDate[]>(
-      mockAnnouncements.map(a => ({...a, date: null}))
-  );
+  const [announcements, setAnnouncements] = useState<AnnouncementWithDate[]>([]);
 
   useEffect(() => {
     const eventsWithRelativeDates = mockEvents.map(event => ({
@@ -185,9 +183,9 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="prose prose-sm prose-p:font-body text-foreground max-w-none rounded-lg border bg-muted/50 p-4">
-              <p>Hello Kulamitra family! It's been a vibrant week. Our annual Ugadi celebrations were a grand success, with over 500 members enjoying the cultural programs and the special feast. A big thank you to all the volunteers who made it happen!</p>
+              <p>Hello Kulamitra family! It\'s been a vibrant week. Our annual Ugadi celebrations were a grand success, with over 500 members enjoying the cultural programs and the special feast. A big thank you to all the volunteers who made it happen!</p>
               <p>On the announcement front, please note the upcoming blood donation camp on April 28th. We encourage all eligible members to participate. Also, registrations for the summer kids camp are now open. You can find the details in the events section.</p>
-              <p>Lastly, we're exploring a new ChitFund scheme for members. More details will be shared soon after the committee meeting next week. Your participation and feedback are always welcome as we work together to strengthen our community bonds.</p>
+              <p>Lastly, we\'re exploring a new ChitFund scheme for members. More details will be shared soon after the committee meeting next week. Your participation and feedback are always welcome as we work together to strengthen our community bonds.</p>
             </div>
           </CardContent>
         </Card>

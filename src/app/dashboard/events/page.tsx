@@ -120,7 +120,7 @@ function EventCard({ event, isPast, formattedDate }: { event: Event, isPast: boo
                 <Dialog onOpenChange={(open) => setDialogOpen(open ? "rsvp" : null)}>
                   <DialogTrigger asChild>
                       <Button className="bg-primary hover:bg-primary/90" variant={rsvpd ? "secondary" : "default"}>
-                          <CheckCircle className="mr-2 h-4 w-4" /> {rsvpd ? "RSVP'd" : "RSVP"}
+                          <CheckCircle className="mr-2 h-4 w-4" /> {rsvpd ? "RSVP\'d" : "RSVP"}
                       </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-md">
