@@ -11,8 +11,8 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
     }, [])
 
     if (!isMounted) {
-      // Render a plain input on the server to avoid hydration mismatch
-      return <input type={type} ref={ref} {...props} style={{ all: 'unset' }} />
+      // Render nothing on the server to avoid hydration mismatch
+      return null
     }
     
     return (
