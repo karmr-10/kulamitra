@@ -23,15 +23,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { useRole } from "../layout";
 
-function EventCard({ event }: { event: Event }) {
+function EventCard({ event, isPast, formattedDate }: { event: Event, isPast: boolean, formattedDate: string | null }) {
     const { role } = useRole();
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    const eventDate = new Date(event.date);
-    eventDate.setUTCHours(0,0,0,0);
-    const isPast = eventDate < now;
-    const formattedDate = eventDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
-
     const [rsvpd, setRsvpd] = useState(false);
     const [volunteering, setVolunteering] = useState(false);
     const [dialogOpen, setDialogOpen] = useState<"rsvp" | "track" | null>(null);
@@ -95,7 +88,7 @@ function EventCard({ event }: { event: Event }) {
             />
             <div className="absolute inset-0 bg-black/30" />
             <Badge variant="secondary" className="absolute right-4 top-4">
-            {formattedDate}
+            {formattedDate || '...'}
             </Badge>
         </div>
         <CardHeader>
@@ -230,32 +223,34 @@ const getRelativeDate = (days: number) => {
   return date.toISOString().split('T')[0];
 };
 
+type ProcessedEvent = Event & { isPast: boolean; formattedDate: string | null };
+
 export default function EventsPage() {
   const { role } = useRole();
-  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
-  const [pastEvents, setPastEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<ProcessedEvent[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
   useEffect(() => {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
 
-    const eventsWithRelativeDates = mockEvents.map(event => ({
-      ...event,
-      date: getRelativeDate(event.dateOffset)
-    }));
-    
-    const upcoming = eventsWithRelativeDates
-      .filter(event => new Date(event.date) >= now)
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-    
-    const past = eventsWithRelativeDates
-      .filter(event => new Date(event.date) < now)
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-    setUpcomingEvents(upcoming);
-    setPastEvents(past);
+    const processedEvents = mockEvents.map(event => {
+      const eventDateStr = getRelativeDate(event.dateOffset);
+      const eventDate = new Date(eventDateStr);
+      eventDate.setUTCHours(0,0,0,0);
+      return {
+        ...event,
+        date: eventDateStr,
+        isPast: eventDate < now,
+        formattedDate: eventDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' }),
+      };
+    });
+    setEvents(processedEvents);
   }, []);
+
+  const upcomingEvents = events.filter(e => !e.isPast).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const pastEvents = events.filter(e => e.isPast).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
 
   return (
     <div className="grid gap-8 md:grid-cols-3">
@@ -296,7 +291,7 @@ export default function EventsPage() {
         <div className="space-y-6">
           <h2 className="font-headline text-2xl font-bold">Upcoming Events</h2>
           {upcomingEvents.length > 0 ? (
-            upcomingEvents.map((event) => <EventCard key={event.id} event={event} />)
+            upcomingEvents.map((event) => <EventCard key={event.id} event={event} isPast={event.isPast} formattedDate={event.formattedDate} />)
           ) : (
             <p className="text-muted-foreground">No upcoming events scheduled.</p>
           )}
@@ -304,7 +299,7 @@ export default function EventsPage() {
          <div className="space-y-6">
           <h2 className="font-headline text-2xl font-bold">Past Events</h2>
            {pastEvents.length > 0 ? (
-            pastEvents.map((event) => <EventCard key={event.id} event={event} />)
+            pastEvents.map((event) => <EventCard key={event.id} event={event} isPast={event.isPast} formattedDate={event.formattedDate} />)
           ) : (
             <p className="text-muted-foreground">No past events to show.</p>
           )}

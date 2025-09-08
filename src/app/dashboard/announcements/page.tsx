@@ -40,7 +40,9 @@ const formatRelativeDate = (dateString: string) => {
 
 export default function AnnouncementsPage() {
   const { role } = useRole();
-  const [announcements, setAnnouncements] = useState<Omit<Announcement, 'dateOffset'>[]>([]);
+  const [announcements, setAnnouncements] = useState<Omit<Announcement, 'dateOffset' | 'date'>[] & { date: string | null }>(
+    mockAnnouncements.map(a => ({...a, date: null}))
+  );
   const [date, setDate] = useState<Date | undefined>(new Date());
 
   useEffect(() => {
@@ -150,7 +152,7 @@ export default function AnnouncementsPage() {
               <CardDescription className="flex items-center gap-2 pt-1">
                 <span>By {announcement.author}</span>
                 <span className="text-xs text-muted-foreground">&bull;</span>
-                <time>{announcement.date}</time>
+                <time>{announcement.date || '...'}</time>
               </CardDescription>
             </CardHeader>
             <CardContent>

@@ -47,24 +47,32 @@ const formatRelativeDate = (dateString: string) => {
     return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 };
 
+type AnnouncementWithDate = Omit<Announcement, 'dateOffset' | 'date'> & { date: string | null };
+
 export default function DashboardPage() {
   const [user, loading] = useAuthState(auth);
   const { role } = useRole();
   const [upcomingEvent, setUpcomingEvent] = useState<Event | null>(null);
-  const [upcomingEventDate, setUpcomingEventDate] = useState<Date | null>(null);
-  const [announcements, setAnnouncements] = useState<Omit<Announcement, 'dateOffset'>[]>([]);
+  const [upcomingEventDateString, setUpcomingEventDateString] = useState<string | null>(null);
+  const [announcements, setAnnouncements] = useState<AnnouncementWithDate[]>(
+      mockAnnouncements.map(a => ({...a, date: null}))
+  );
 
   useEffect(() => {
     const eventsWithRelativeDates = mockEvents.map(event => ({
       ...event,
       date: getRelativeDate(event.dateOffset)
     }));
-    const sortedUpcomingEvent = eventsWithRelativeDates.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
-    setUpcomingEvent(sortedUpcomingEvent);
-
-    const eventDate = new Date(sortedUpcomingEvent.date);
-    eventDate.setUTCHours(0,0,0,0);
-    setUpcomingEventDate(eventDate);
+    const sortedUpcomingEvent = eventsWithRelativeDates
+        .filter(event => new Date(event.date) >= new Date())
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
+    
+    if (sortedUpcomingEvent) {
+        setUpcomingEvent(sortedUpcomingEvent);
+        const eventDate = new Date(sortedUpcomingEvent.date);
+        eventDate.setUTCHours(0,0,0,0);
+        setUpcomingEventDateString(eventDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'UTC' }));
+    }
 
     const announcementsWithRelativeDates = mockAnnouncements.map(announcement => ({
       ...announcement,
@@ -127,7 +135,7 @@ export default function DashboardPage() {
           <CardContent>
             <div className="text-2xl font-bold truncate">{upcomingEvent?.title || 'Loading...'}</div>
             <p className="text-xs text-muted-foreground">
-              {upcomingEventDate ? upcomingEventDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'UTC' }) : '...'}
+              {upcomingEventDateString || '...'}
             </p>
           </CardContent>
         </Card>
@@ -205,7 +213,7 @@ export default function DashboardPage() {
                     {announcement.content}
                   </p>
                 </div>
-                <div className="ml-auto text-sm text-muted-foreground whitespace-nowrap">{announcement.date}</div>
+                <div className="ml-auto text-sm text-muted-foreground whitespace-nowrap">{announcement.date || '...'}</div>
               </div>
             ))}
           </CardContent>
