@@ -31,6 +31,10 @@ import {
 } from "@/components/ui/table";
 import { mockAnnouncements, mockEvents } from "@/lib/mock-data";
 import { Event, Announcement } from "@/lib/types";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/lib/firebase";
+import { useRole } from "./layout";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const getRelativeDate = (days: number) => {
   const date = new Date();
@@ -44,6 +48,8 @@ const formatRelativeDate = (dateString: string) => {
 };
 
 export default function DashboardPage() {
+  const [user, loading] = useAuthState(auth);
+  const { role } = useRole();
   const [upcomingEvent, setUpcomingEvent] = useState<Event | null>(null);
   const [upcomingEventDate, setUpcomingEventDate] = useState<Date | null>(null);
   const [announcements, setAnnouncements] = useState<Omit<Announcement, 'dateOffset'>[]>([]);
@@ -66,9 +72,32 @@ export default function DashboardPage() {
     }));
     setAnnouncements(announcementsWithRelativeDates);
   }, []);
+  
+  const welcomeMessage = () => {
+    if (loading) {
+      return <Skeleton className="h-8 w-64" />;
+    }
+    if (user) {
+      return `Welcome back, ${user.displayName || 'Friend'}!`;
+    }
+    return "Welcome to your Dashboard!";
+  }
+  
+  const welcomeDescription = () => {
+    if (role === 'admin') {
+      return "Here's an overview of your community's activities. You have administrative access.";
+    }
+    return "Here's what's happening in your community.";
+  }
+
 
   return (
     <div className="flex flex-1 flex-col gap-4 md:gap-8">
+      <div>
+        <h1 className="font-headline text-3xl font-bold tracking-tight">{welcomeMessage()}</h1>
+        <p className="text-muted-foreground">{welcomeDescription()}</p>
+      </div>
+
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
