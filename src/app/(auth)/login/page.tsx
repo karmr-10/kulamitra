@@ -32,9 +32,12 @@ export default function LoginPage() {
   const [activeTab, setActiveTab] = useState('email');
 
   useEffect(() => {
-    if (activeTab !== 'mobile') return;
+    if (activeTab !== 'mobile' || !recaptchaContainerRef.current) return;
     
-    const recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainerRef.current!, {
+    // Clear the container before rendering
+    recaptchaContainerRef.current.innerHTML = '';
+
+    const recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainerRef.current, {
         'size': 'normal',
         'callback': () => {
             toast.success("reCAPTCHA verified! You can now send the OTP.");
@@ -48,7 +51,10 @@ export default function LoginPage() {
     recaptchaVerifier.render();
 
     return () => {
-      recaptchaVerifier.clear();
+      // It's good practice to clear the verifier on cleanup
+      if ((window as any).recaptchaVerifier) {
+          (window as any).recaptchaVerifier.clear();
+      }
     };
   }, [activeTab]);
 
