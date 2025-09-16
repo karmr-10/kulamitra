@@ -42,29 +42,29 @@ const initialChitFunds = [
   {
     id: 'cf-01',
     name: 'Griha Lakshmi Chit',
-    amount: '₹ 5,00,000',
+    amount: 'INR 5,00,000',
     duration: '25 Months',
     members: 25,
     status: 'Open',
-    contribution: '₹ 20,000'
+    contribution: 'INR 20,000'
   },
   {
     id: 'cf-02',
     name: 'Vyapar Vridhi Fund',
-    amount: '₹ 10,00,000',
+    amount: 'INR 10,00,000',
     duration: '20 Months',
     members: 20,
     status: 'Open',
-    contribution: '₹ 50,000'
+    contribution: 'INR 50,000'
   },
   {
     id: 'cf-03',
     name: 'Vidya Nidhi Scheme',
-    amount: '₹ 2,50,000',
+    amount: 'INR 2,50,000',
     duration: '50 Months',
     members: 50,
     status: 'Full',
-    contribution: '₹ 5,000'
+    contribution: 'INR 5,000'
   },
 ];
 
@@ -83,7 +83,7 @@ function AddChitFundForm({ onAdd }: { onAdd: (newFund: Omit<ChitFund, 'id' | 'st
             toast.error("Please fill out all fields.");
             return;
         }
-        onAdd({ name, amount: `₹ ${parseInt(amount, 10).toLocaleString('en-IN')}`, duration: `${duration} Months`, members: parseInt(members, 10), contribution: `₹ ${parseInt(contribution, 10).toLocaleString('en-IN')}` });
+        onAdd({ name, amount: `INR ${parseInt(amount, 10).toLocaleString('en-IN')}`, duration: `${duration} Months`, members: parseInt(members, 10), contribution: `INR ${parseInt(contribution, 10).toLocaleString('en-IN')}` });
     };
 
     return (
@@ -94,7 +94,7 @@ function AddChitFundForm({ onAdd }: { onAdd: (newFund: Omit<ChitFund, 'id' | 'st
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                  <div className="space-y-2">
-                    <Label htmlFor="fund-amount">Total Amount (₹)</Label>
+                    <Label htmlFor="fund-amount">Total Amount (INR)</Label>
                     <Input id="fund-amount" type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g., 500000" />
                 </div>
                  <div className="space-y-2">
@@ -108,7 +108,7 @@ function AddChitFundForm({ onAdd }: { onAdd: (newFund: Omit<ChitFund, 'id' | 'st
                     <Input id="fund-members" type="number" value={members} onChange={(e) => setMembers(e.target.value)} placeholder="e.g., 25" />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="fund-contribution">Monthly Contribution (₹)</Label>
+                    <Label htmlFor="fund-contribution">Monthly Contribution (INR)</Label>
                     <Input id="fund-contribution" type="number" value={contribution} onChange={(e) => setContribution(e.target.value)} placeholder="e.g., 20000" />
                 </div>
             </div>
@@ -312,5 +312,3 @@ export default function ChitFundsPage() {
     </div>
   );
 }
-
-    

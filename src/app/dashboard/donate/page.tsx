@@ -72,7 +72,7 @@ export default function DonatePage() {
             <CardContent className="space-y-4">
                 <div className="rounded-lg border bg-muted/50 p-4">
                     <p className="text-sm text-muted-foreground">Amount Paid</p>
-                    <p className="text-4xl font-bold">₹{amount}</p>
+                    <p className="text-4xl font-bold">INR {amount}</p>
                 </div>
                 <p className="text-xs text-muted-foreground">A receipt has been sent to your registered email address.</p>
             </CardContent>
@@ -134,12 +134,12 @@ export default function DonatePage() {
               <div className="space-y-2">
                 <Label htmlFor="amount" className="text-lg">Amount (INR)</Label>
                 <div className="relative">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-lg text-muted-foreground">₹</span>
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-lg text-muted-foreground">INR</span>
                     <Input 
                       id="amount" 
                       type="number" 
                       placeholder="Enter amount" 
-                      className="h-12 pl-8 text-lg" 
+                      className="h-12 pl-12 text-lg" 
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
                       required
@@ -148,7 +148,7 @@ export default function DonatePage() {
               </div>
               <div className="flex gap-2">
                 {[101, 501, 1001, 2001].map(presetAmount => (
-                    <Button key={presetAmount} type="button" variant="outline" className="flex-1" onClick={() => handleAmountButtonClick(presetAmount)}>₹{presetAmount}</Button>
+                    <Button key={presetAmount} type="button" variant="outline" className="flex-1" onClick={() => handleAmountButtonClick(presetAmount)}>INR {presetAmount}</Button>
                 ))}
               </div>
 
@@ -234,7 +234,7 @@ export default function DonatePage() {
             </CardContent>
             <CardFooter>
                  <Button type="submit" size="lg" className="w-full text-lg h-12 bg-accent hover:bg-accent/90">
-                    Proceed to Pay ₹{amount || 0}
+                    Proceed to Pay INR {amount || 0}
                 </Button>
             </CardFooter>
         </form>
@@ -242,5 +242,3 @@ export default function DonatePage() {
     </div>
   );
 }
-
-    
