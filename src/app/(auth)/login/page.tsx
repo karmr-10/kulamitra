@@ -34,6 +34,10 @@ export default function LoginPage() {
   useEffect(() => {
     if (activeTab !== 'mobile' || !recaptchaContainerRef.current) return;
     
+    if ((window as any).recaptchaVerifier) {
+      (window as any).recaptchaVerifier.clear();
+    }
+    
     // Clear the container before rendering
     recaptchaContainerRef.current.innerHTML = '';
 
@@ -51,7 +55,6 @@ export default function LoginPage() {
     recaptchaVerifier.render();
 
     return () => {
-      // It's good practice to clear the verifier on cleanup
       if ((window as any).recaptchaVerifier) {
           (window as any).recaptchaVerifier.clear();
       }
