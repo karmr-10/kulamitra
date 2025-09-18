@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Heart, QrCode, CreditCard, Banknote, Download, CheckCircle } from "lucide-react";
+import { Heart, QrCode, CreditCard, Banknote, Download, CheckCircle, MessageSquare } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import toast from "react-hot-toast";
 
@@ -28,6 +28,7 @@ export default function DonatePage() {
   const [donationFor, setDonationFor] = useState<DonationCategory | "">("");
   const [otherCategory, setOtherCategory] = useState("");
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [whatsAppNumber, setWhatsAppNumber] = useState("");
 
   const handleAmountButtonClick = (presetAmount: number) => {
     setAmount(presetAmount.toString());
@@ -57,6 +58,24 @@ export default function DonatePage() {
       default: return "";
     }
   }
+  
+  const handleSendToWhatsApp = () => {
+    if (!whatsAppNumber.match(/^\d{10,12}$/)) {
+        toast.error("Please enter a valid WhatsApp number (with country code, e.g., 91xxxxxxxxxx).");
+        return;
+    }
+    const categoryName = getCategoryName();
+    const message = `Hello! Thank you for your generous donation of INR ${amount} towards ${categoryName}. Your contribution is greatly valued. - Kulamitra Team`;
+    
+    // The phone number for the Kulamitra WhatsApp account (using a placeholder)
+    const kulamitraWhatsAppNumber = '910000000000';
+
+    const url = `https://wa.me/${kulamitraWhatsAppNumber}?text=${encodeURIComponent(message)}`;
+    
+    window.open(url, '_blank');
+    toast.success("Redirecting to WhatsApp...");
+  }
+
 
   if (paymentSuccess) {
     return (
@@ -69,18 +88,34 @@ export default function DonatePage() {
                 <CardTitle className="font-headline mt-4 text-3xl">Payment Successful!</CardTitle>
                 <CardDescription>Thank you for your generous contribution towards <strong>{getCategoryName()}</strong>.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
                 <div className="rounded-lg border bg-muted/50 p-4">
                     <p className="text-sm text-muted-foreground">Amount Paid</p>
                     <p className="text-4xl font-bold">INR {amount}</p>
                 </div>
-                <p className="text-xs text-muted-foreground">A receipt has been sent to your registered email address.</p>
+                <div className="space-y-2 text-left">
+                  <Label htmlFor="whatsapp-number">Get receipt on WhatsApp</Label>
+                  <div className="flex gap-2">
+                    <Input 
+                        id="whatsapp-number"
+                        type="tel"
+                        placeholder="e.g., 919876543210"
+                        value={whatsAppNumber}
+                        onChange={(e) => setWhatsAppNumber(e.target.value)}
+                    />
+                    <Button variant="outline" onClick={handleSendToWhatsApp}>
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      Send
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">A formal receipt has also been sent to your registered email.</p>
+                </div>
             </CardContent>
             <CardFooter className="flex-col gap-4">
                 <Button size="lg" className="w-full" onClick={() => toast.success("Receipt downloaded (demo).")}>
                     <Download className="mr-2 h-4 w-4" /> Download Receipt
                 </Button>
-                 <Button variant="outline" className="w-full" onClick={() => { setPaymentSuccess(false); setAmount(""); setDonationFor(""); }}>
+                 <Button variant="outline" className="w-full" onClick={() => { setPaymentSuccess(false); setAmount(""); setDonationFor(""); setWhatsAppNumber(""); }}>
                     Make Another Donation
                 </Button>
             </CardFooter>
