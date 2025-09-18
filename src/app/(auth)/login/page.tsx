@@ -30,6 +30,8 @@ export default function LoginPage() {
   const [otpSent, setOtpSent] = useState(false);
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState('email');
+  const [isRecaptchaVerified, setIsRecaptchaVerified] = useState(false);
+
 
   useEffect(() => {
     if (activeTab !== 'mobile' || !recaptchaContainerRef.current) return;
@@ -40,14 +42,17 @@ export default function LoginPage() {
     
     // Clear the container before rendering
     recaptchaContainerRef.current.innerHTML = '';
+    setIsRecaptchaVerified(false);
 
     const recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainerRef.current, {
         'size': 'normal',
         'callback': () => {
             toast.success("reCAPTCHA verified! You can now send the OTP.");
+            setIsRecaptchaVerified(true);
         },
         'expired-callback': () => {
             toast.error("reCAPTCHA expired. Please try again.");
+            setIsRecaptchaVerified(false);
         }
     });
 
@@ -104,6 +109,10 @@ export default function LoginPage() {
         toast.error("Invalid phone number. Please include country code (e.g., 91 for India).");
       } else {
         toast.error("Failed to send OTP. Please check the number or reCAPTCHA and try again.");
+      }
+      setIsRecaptchaVerified(false);
+      if ((window as any).recaptchaVerifier) {
+          (window as any).recaptchaVerifier.render();
       }
     } finally {
       setLoading(false);
@@ -185,35 +194,50 @@ export default function LoginPage() {
             </TabsContent>
              <TabsContent value="mobile">
                 <form className="space-y-4 pt-4" onSubmit={handleMobileSubmit}>
-                    <div className="space-y-2">
-                        <Label htmlFor="mobile">Mobile Number</Label>
-                        <Input 
-                            id="mobile" 
-                            type="tel" 
-                            placeholder="919876543210" 
-                            required 
-                            className="w-full" 
-                            value={phoneNumber}
-                            onChange={(e) => setPhoneNumber(e.target.value)}
-                            disabled={otpSent || loading}
-                        />
-                         <p className="text-xs text-muted-foreground">Add country code. Test with numbers in Firebase Auth.</p>
-                    </div>
-                    {otpSent && (
-                        <div className="space-y-2">
-                            <Label htmlFor="otp">One-Time Password (OTP)</Label>
-                            <Input 
-                                id="otp" 
-                                type="text" 
-                                placeholder="Enter OTP" 
-                                required 
-                                value={otp}
-                                onChange={(e) => setOtp(e.target.value)}
-                                disabled={loading}
-                            />
-                        </div>
+                    {!otpSent ? (
+                        <>
+                            <div className="space-y-2">
+                                <Label htmlFor="mobile">Mobile Number</Label>
+                                <Input 
+                                    id="mobile" 
+                                    type="tel" 
+                                    placeholder="919876543210" 
+                                    required 
+                                    className="w-full" 
+                                    value={phoneNumber}
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                    disabled={loading}
+                                />
+                                <p className="text-xs text-muted-foreground">Add country code. Test with numbers in Firebase Auth.</p>
+                            </div>
+                            <div id="recaptcha-container-login" ref={recaptchaContainerRef} className="flex justify-center my-4"></div>
+                            <Button type="submit" className="w-full bg-accent hover:bg-accent/90" disabled={loading || !phoneNumber || !isRecaptchaVerified}>
+                                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                <Smartphone className="mr-2 h-4 w-4" /> 
+                                Send OTP
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <div className="space-y-2">
+                                <Label htmlFor="otp">One-Time Password (OTP)</Label>
+                                <Input 
+                                    id="otp" 
+                                    type="text" 
+                                    placeholder="Enter OTP" 
+                                    required 
+                                    value={otp}
+                                    onChange={(e) => setOtp(e.target.value)}
+                                    disabled={loading}
+                                />
+                            </div>
+                            <Button type="submit" className="w-full bg-accent hover:bg-accent/90" disabled={loading || !otp}>
+                                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                <Smartphone className="mr-2 h-4 w-4" /> 
+                                Sign In with OTP
+                            </Button>
+                        </>
                     )}
-                     <div id="recaptcha-container-login" ref={recaptchaContainerRef} className="flex justify-center my-4"></div>
                     <div className="space-y-3">
                         <Label>Sign in as</Label>
                         <RadioGroup defaultValue="member" className="flex items-center gap-4">
@@ -227,11 +251,6 @@ export default function LoginPage() {
                             </div>
                         </RadioGroup>
                     </div>
-                    <Button type="submit" className="w-full bg-accent hover:bg-accent/90" disabled={loading || !phoneNumber || (otpSent && !otp)}>
-                        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        <Smartphone className="mr-2 h-4 w-4" /> 
-                        {otpSent ? "Sign In with OTP" : "Send OTP"}
-                    </Button>
                 </form>
              </TabsContent>
           </Tabs>
@@ -262,5 +281,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-    
