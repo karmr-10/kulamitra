@@ -8,7 +8,6 @@ const firebaseConfig = {
   "projectId": "kulamitra",
   "appId": "1:701157389287:web:ea35cb2e166c491f6a0342",
   "storageBucket": "kulamitra.firebasestorage.app",
-  "apiKey": "AIzaSyDHhknrrBGmBEbKQVtgOEck7Q6kqE2SLq8",
   "authDomain": "kulamitra.firebaseapp.com",
   "measurementId": "",
   "messagingSenderId": "701157389287"
